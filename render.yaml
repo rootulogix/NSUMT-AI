@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: NSUMT-AI
+    env: node
+    rootDir: ""
+    buildCommand: pnpm install
+    startCommand: pnpm start
