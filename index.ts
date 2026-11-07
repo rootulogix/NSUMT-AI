@@ -14,13 +14,13 @@ bot.on('text', (ctx) => ctx.reply(`Эхо-ответ: ${ctx.message.text}`));
 bot.launch();
 console.log('Telegram bot started successfully!');
 
-// HTTP-сервер для Render, чтобы сервис не засыпал и считался активным
+// HTTP-сервер для Render, чтобы сервис не засыпал и отвечал на внешние запросы
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('NSUMT-AI Bot is running continuously!');
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 3000;
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Health-check server is listening on port ${PORT}`);
 });
