@@ -1,0 +1,2770 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NSUMT-AI | Ulogix Core</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #000000;
+      --card: rgba(13, 13, 18, 0.88);
+      --card-hover: rgba(22, 22, 30, 0.96);
+      --border: rgba(255, 255, 255, 0.13);
+      --text: #ffffff;
+      --muted: #8e8e93;
+      --hacker-cyan: #00f5d4;
+      --hacker-blue: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 14px 16px 84px;
+    }
+
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    /* === ВЕРХНЯЯ ПАНЕЛЬ: БРАУЗЕР + НЕОНОВЫЙ ХАКЕРСКИЙ ГЛОБУС === */
+    .browser-bar-wrap {
+      position: sticky;
+      top: 10px;
+      z-index: 40;
+      margin-bottom: 18px;
+    }
+
+    .top-nav-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .browser-bar {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(16, 16, 22, 0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      padding: 8px 10px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.75), 0 0 18px rgba(56, 189, 248, 0.12);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .browser-bar:focus-within {
+      border-color: rgba(56, 189, 248, 0.75);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.85), 0 0 22px rgba(56, 189, 248, 0.35);
+    }
+
+    .browser-prefix {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 7px;
+      border-radius: 9px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .browser-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .browser-input::placeholder {
+      color: #7c7c85;
+    }
+
+    .browser-clear {
+      display: none;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #d1d5db;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 13px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .browser-go {
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+
+    /* КНОПКА ВРАЩАЮЩЕГОСЯ НЕОНОВОГО ГЛОБУСА (HACKER STYLE) */
+    @keyframes globePulse {
+      0%, 100% {
+        border-color: rgba(0, 245, 212, 0.55);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 14px rgba(0, 245, 212, 0.35), inset 0 0 10px rgba(0, 245, 212, 0.15);
+      }
+      50% {
+        border-color: rgba(56, 189, 248, 1);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.9), 0 0 24px rgba(0, 245, 212, 0.85), inset 0 0 14px rgba(56, 189, 248, 0.35);
+      }
+    }
+
+    .globe-btn {
+      position: relative;
+      height: 44px;
+      padding: 0 10px 0 6px;
+      border-radius: 16px;
+      background: rgba(10, 16, 22, 0.94);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 245, 212, 0.65);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      flex-shrink: 0;
+      animation: globePulse 2.4s infinite ease-in-out;
+      transition: transform 0.15s;
+    }
+
+    .globe-btn:active {
+      transform: scale(0.94);
+    }
+
+    #hacker-globe {
+      width: 30px;
+      height: 30px;
+      display: block;
+    }
+
+    .globe-lang-code {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: #00f5d4;
+      text-shadow: 0 0 8px rgba(0, 245, 212, 0.9);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Индикатор активного перевода */
+    .translating-toast {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(0, 245, 212, 0.12);
+      border: 1px solid rgba(0, 245, 212, 0.45);
+      color: #00f5d4;
+      font-family: monospace;
+      font-size: 11px;
+      text-shadow: 0 0 8px rgba(0, 245, 212, 0.6);
+    }
+
+    .translating-toast.active {
+      display: flex;
+    }
+
+    /* Быстрые закладки браузера */
+    .browser-bookmarks {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 7px 2px 0;
+      scrollbar-width: none;
+    }
+    .browser-bookmarks::-webkit-scrollbar {
+      display: none;
+    }
+
+    .bookmark-pill {
+      font-size: 11px;
+      font-weight: 600;
+      color: #b4b4bd;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      padding: 4px 10px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .bookmark-pill:hover, .bookmark-pill:active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #ffffff;
+    }
+
+    /* Выпадающие результаты поиска браузера */
+    .browser-dropdown {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50px;
+      background: rgba(14, 14, 20, 0.97);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 16px;
+      padding: 6px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+      z-index: 50;
+    }
+
+    .browser-dropdown.open {
+      display: block;
+    }
+
+    .search-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .search-item:hover, .search-item:active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .search-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .search-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .search-item-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .search-item-go {
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    /* Шапка с аватаром */
+    header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .avatar-ring {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(145deg, #ffffff, #3a3a42);
+      box-shadow: 0 0 28px rgba(255, 255, 255, 0.18);
+    }
+
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #ffffff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      font-size: 10px;
+      letter-spacing: 1.3px;
+      color: #b4b4bb;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Карточки приложений */
+    .app-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .app-card {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 15px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: transform 0.15s, background 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .app-card:hover {
+      border-color: rgba(255, 255, 255, 0.28);
+      background: var(--card-hover);
+    }
+
+    .app-card:active {
+      transform: scale(0.985);
+    }
+
+    .app-card.hidden-by-search {
+      display: none;
+    }
+
+    .app-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      background: rgba(16, 16, 22, 0.9);
+    }
+
+    /* === КСЕНОНОВЫЕ АНИМАЦИИ МЕРЦАНИЯ === */
+    @keyframes xenonRed {
+      0%, 100% { border-color: rgba(255, 42, 85, 0.55); box-shadow: 0 0 12px rgba(255, 42, 85, 0.3), inset 0 0 10px rgba(255, 42, 85, 0.2); }
+      45% { border-color: rgba(255, 42, 85, 1); box-shadow: 0 0 26px rgba(255, 42, 85, 0.8), 0 0 42px rgba(255, 42, 85, 0.38), inset 0 0 16px rgba(255, 42, 85, 0.45); }
+      52% { border-color: rgba(255, 100, 130, 0.65); box-shadow: 0 0 14px rgba(255, 42, 85, 0.35); }
+      60% { border-color: rgba(255, 42, 85, 1); box-shadow: 0 0 30px rgba(255, 42, 85, 0.9), inset 0 0 18px rgba(255, 42, 85, 0.5); }
+    }
+    @keyframes svgRedPulse {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 42, 85, 0.75)); }
+      50% { filter: drop-shadow(0 0 14px rgba(255, 42, 85, 1)) drop-shadow(0 0 22px rgba(255, 80, 110, 0.9)); }
+    }
+    .xenon-cad {
+      background: radial-gradient(circle at center, rgba(255, 42, 85, 0.24), rgba(22, 4, 10, 0.85));
+      border: 1px solid rgba(255, 42, 85, 0.65);
+      animation: xenonRed 2.6s infinite ease-in-out;
+    }
+    #cad-splash-icon {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .xenon-cad svg {
+      position: relative;
+      z-index: 2;
+      animation: svgRedPulse 2.6s infinite ease-in-out;
+    }
+
+    @keyframes xenonPython {
+      0%, 100% { border-color: rgba(56, 189, 248, 0.9); box-shadow: -4px -4px 22px rgba(56, 189, 248, 0.7), 4px 4px 12px rgba(250, 204, 21, 0.25), inset 0 0 14px rgba(56, 189, 248, 0.35); }
+      50% { border-color: rgba(250, 204, 21, 0.95); box-shadow: -4px -4px 12px rgba(56, 189, 248, 0.25), 4px 4px 24px rgba(250, 204, 21, 0.8), inset 0 0 14px rgba(250, 204, 21, 0.35); }
+    }
+    @keyframes pyBlueGlow {
+      0%, 100% { filter: drop-shadow(0 0 11px rgba(56, 189, 248, 1)); opacity: 1; }
+      50% { filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.4)); opacity: 0.85; }
+    }
+    @keyframes pyYellowGlow {
+      0%, 100% { filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.4)); opacity: 0.85; }
+      50% { filter: drop-shadow(0 0 12px rgba(250, 204, 21, 1)); opacity: 1; }
+    }
+    .xenon-python { background: radial-gradient(circle at 25% 25%, rgba(56, 189, 248, 0.2), rgba(250, 204, 21, 0.16)); animation: xenonPython 2.4s infinite ease-in-out; }
+    .xenon-python .py-blue { animation: pyBlueGlow 2.4s infinite ease-in-out; }
+    .xenon-python .py-yellow { animation: pyYellowGlow 2.4s infinite ease-in-out; }
+
+    @keyframes xenonC {
+      0%, 100% { border-color: rgba(59, 130, 246, 0.45); box-shadow: 0 0 10px rgba(59, 130, 246, 0.25), inset 0 0 8px rgba(59, 130, 246, 0.15); }
+      40% { border-color: rgba(96, 165, 250, 1); box-shadow: 0 0 25px rgba(59, 130, 246, 0.85), 0 0 38px rgba(96, 165, 250, 0.4), inset 0 0 15px rgba(59, 130, 246, 0.4); }
+      56% { border-color: rgba(147, 197, 253, 1); box-shadow: 0 0 28px rgba(96, 165, 250, 0.9); }
+    }
+    @keyframes svgC {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6)); }
+      45% { filter: drop-shadow(0 0 13px rgba(96, 165, 250, 1)); }
+    }
+    .xenon-c { background: radial-gradient(circle at center, rgba(59, 130, 246, 0.24), rgba(15, 25, 60, 0.4)); animation: xenonC 2.8s infinite ease-in-out 0.3s; }
+    .xenon-c svg { animation: svgC 2.8s infinite ease-in-out 0.3s; }
+
+    @keyframes xenonCpp {
+      0%, 100% { border-color: rgba(6, 182, 212, 0.45); box-shadow: 0 0 10px rgba(6, 182, 212, 0.25), inset 0 0 8px rgba(6, 182, 212, 0.15); }
+      50% { border-color: rgba(34, 211, 238, 1); box-shadow: 0 0 26px rgba(6, 182, 212, 0.85), 0 0 42px rgba(34, 211, 238, 0.45), inset 0 0 16px rgba(34, 211, 238, 0.45); }
+      66% { border-color: rgba(103, 232, 249, 1); box-shadow: 0 0 30px rgba(34, 211, 238, 0.95); }
+    }
+    @keyframes svgCpp {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.6)); }
+      50% { filter: drop-shadow(0 0 14px rgba(34, 211, 238, 1)); }
+    }
+    .xenon-cpp { background: radial-gradient(circle at center, rgba(6, 182, 212, 0.25), rgba(8, 45, 65, 0.4)); animation: xenonCpp 2.5s infinite ease-in-out 0.6s; }
+    .xenon-cpp svg { animation: svgCpp 2.5s infinite ease-in-out 0.6s; }
+
+    @keyframes xenonJava {
+      0%, 100% { border-color: rgba(249, 115, 22, 0.95); box-shadow: 0 -4px 22px rgba(249, 115, 22, 0.75), 0 4px 12px rgba(56, 189, 248, 0.25), inset 0 0 14px rgba(249, 115, 22, 0.35); }
+      50% { border-color: rgba(56, 189, 248, 0.95); box-shadow: 0 -4px 12px rgba(249, 115, 22, 0.25), 0 4px 22px rgba(56, 189, 248, 0.75), inset 0 0 14px rgba(56, 189, 248, 0.35); }
+    }
+    @keyframes javaFlame {
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(249, 115, 22, 1)); }
+      50% { filter: drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)); }
+    }
+    @keyframes javaCup {
+      0%, 100% { filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.45)); }
+      50% { filter: drop-shadow(0 0 12px rgba(56, 189, 248, 1)); }
+    }
+    .xenon-java { background: radial-gradient(circle at center, rgba(249, 115, 22, 0.2), rgba(56, 189, 248, 0.16)); animation: xenonJava 2.7s infinite ease-in-out 0.2s; }
+    .xenon-java .java-steam { animation: javaFlame 2.7s infinite ease-in-out 0.2s; }
+    .xenon-java .java-cup { animation: javaCup 2.7s infinite ease-in-out 0.2s; }
+
+    @keyframes xenonCsharp {
+      0%, 100% { border-color: rgba(168, 85, 247, 0.45); box-shadow: 0 0 10px rgba(168, 85, 247, 0.25), inset 0 0 8px rgba(168, 85, 247, 0.15); }
+      45% { border-color: rgba(192, 132, 252, 1); box-shadow: 0 0 26px rgba(168, 85, 247, 0.85), 0 0 40px rgba(192, 132, 252, 0.45), inset 0 0 15px rgba(168, 85, 247, 0.4); }
+      62% { border-color: rgba(216, 180, 254, 1); box-shadow: 0 0 28px rgba(192, 132, 252, 0.95); }
+    }
+    @keyframes svgCsharp {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(192, 132, 252, 0.6)); }
+      50% { filter: drop-shadow(0 0 14px rgba(192, 132, 252, 1)); }
+    }
+    .xenon-csharp { background: radial-gradient(circle at center, rgba(168, 85, 247, 0.24), rgba(45, 15, 70, 0.4)); animation: xenonCsharp 2.9s infinite ease-in-out 0.4s; }
+    .xenon-csharp svg { animation: svgCsharp 2.9s infinite ease-in-out 0.4s; }
+
+    @keyframes xenonGreen {
+      0%, 100% { border-color: rgba(16, 185, 129, 0.45); box-shadow: 0 0 10px rgba(16, 185, 129, 0.25), inset 0 0 8px rgba(16, 185, 129, 0.15); }
+      50% { border-color: rgba(52, 211, 153, 1); box-shadow: 0 0 24px rgba(16, 185, 129, 0.8), 0 0 38px rgba(52, 211, 153, 0.35), inset 0 0 14px rgba(16, 185, 129, 0.35); }
+    }
+    @keyframes svgGreen {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.6)); }
+      50% { filter: drop-shadow(0 0 13px rgba(52, 211, 153, 1)); }
+    }
+    .xenon-lib { background: radial-gradient(circle at center, rgba(16, 185, 129, 0.22), rgba(6, 55, 40, 0.4)); animation: xenonGreen 3.1s infinite ease-in-out 0.5s; }
+    .xenon-lib svg { animation: svgGreen 3.1s infinite ease-in-out 0.5s; }
+
+    .app-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .app-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .app-meta h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .status-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .status-live {
+      background: rgba(74, 222, 128, 0.14);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+    }
+
+    .status-next {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .app-meta p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .open-btn {
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #000000;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.22);
+    }
+
+    .open-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    /* Экраны модулей */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .panel-card {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .panel-card h3 {
+      font-size: 15px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-card p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    /* Встроенный веб-браузер (iframe) */
+    .web-frame-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: #0a0d12;
+      height: 390px;
+      margin-bottom: 10px;
+    }
+
+    #internal-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+    }
+
+    /* Панель инструментов AutoCAD */
+    .cad-toolbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tool-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      padding: 8px 4px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tool-btn.active {
+      background: #ff2a55;
+      border-color: #ff2a55;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 42, 85, 0.55);
+    }
+
+    .canvas-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: #080a0f;
+      touch-action: none;
+    }
+
+    #cad-canvas {
+      display: block;
+      width: 100%;
+      height: 270px;
+      cursor: crosshair;
+    }
+
+    .coords-bar {
+      display: flex;
+      justify-content: space-between;
+      font-family: monospace;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* Панель библиотек языка */
+    .lib-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .lib-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #d1d5db;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .include-all-btn {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(74, 222, 128, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      color: #4ade80;
+      cursor: pointer;
+    }
+
+    .lib-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 115px;
+      overflow-y: auto;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 12px;
+    }
+
+    .lib-chip {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #e5e7eb;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .lib-chip.included {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: rgba(56, 189, 248, 0.55);
+      color: #7dd3fc;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+    }
+
+    .code-editor {
+      width: 100%;
+      min-height: 215px;
+      background: #06080c;
+      color: #f3f4f6;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .code-editor:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+
+    .stdin-input {
+      width: 100%;
+      background: #06080c;
+      color: #d1d5db;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .terminal-box {
+      background: #040507;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #4ade80;
+      min-height: 80px;
+      max-height: 190px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 10px;
+    }
+
+    .terminal-box.error {
+      color: #f87171;
+      border-color: rgba(248, 113, 113, 0.45);
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #ffffff;
+      color: #000000;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .action-btn.neon-run {
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+    }
+
+    .action-btn.outline {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid var(--border);
+    }
+
+    /* === ПЛАВАЮЩАЯ КНОПКА ПОДДЕРЖКИ === */
+    @keyframes supportXenon {
+      0%, 100% {
+        border-color: rgba(56, 189, 248, 0.65);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 14px rgba(56, 189, 248, 0.45);
+      }
+      50% {
+        border-color: rgba(125, 211, 252, 1);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.9), 0 0 26px rgba(56, 189, 248, 0.9);
+      }
+    }
+
+    .support-fab {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 999px;
+      background: rgba(14, 18, 28, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      animation: supportXenon 2.6s infinite ease-in-out;
+      transition: transform 0.15s;
+    }
+
+    .support-fab:active {
+      transform: scale(0.95);
+    }
+
+    .support-fab svg {
+      color: #38bdf8;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    /* === МОДАЛЬНЫЕ ОКНА (ПОДДЕРЖКА + ВЫБОР ЯЗЫКА МИРА) === */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(10px);
+      align-items: flex-end;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .support-sheet, .lang-sheet {
+      width: 100%;
+      max-width: 500px;
+      background: #0d1017;
+      border: 1px solid rgba(0, 245, 212, 0.45);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 0 40px rgba(0, 245, 212, 0.22);
+    }
+
+    .lang-sheet {
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .support-sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .support-online {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #00f5d4;
+      font-family: monospace;
+    }
+
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00f5d4;
+      box-shadow: 0 0 8px #00f5d4;
+    }
+
+    .close-modal-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .lang-search-input {
+      width: 100%;
+      background: #06080d;
+      border: 1px solid rgba(0, 245, 212, 0.4);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .lang-search-input:focus {
+      box-shadow: 0 0 14px rgba(0, 245, 212, 0.3);
+    }
+
+    .lang-list-scroll {
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      padding-right: 2px;
+    }
+
+    .lang-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+
+    .lang-option:hover, .lang-option:active {
+      background: rgba(0, 245, 212, 0.14);
+      border-color: rgba(0, 245, 212, 0.5);
+    }
+
+    .lang-option.selected {
+      background: rgba(0, 245, 212, 0.18);
+      border-color: #00f5d4;
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.3);
+    }
+
+    .lang-native {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #ffffff;
+      display: block;
+    }
+
+    .lang-sub {
+      font-size: 10px;
+      color: #8e8e93;
+      display: block;
+    }
+
+    .lang-iso {
+      font-family: monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: #00f5d4;
+      background: rgba(0, 245, 212, 0.1);
+      padding: 2px 6px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .topic-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .topic-chip {
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #d1d5db;
+      cursor: pointer;
+    }
+
+    .topic-chip.selected {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    .support-textarea {
+      width: 100%;
+      min-height: 90px;
+      background: #07090e;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #ffffff;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: #636369;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="stars"></canvas>
+
+  <div class="container">
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ: ВСТРОЕННЫЙ БРАУЗЕР + ВРАЩАЮЩИЙСЯ НЕОНОВЫЙ ГЛОБУС -->
+    <div class="browser-bar-wrap">
+      <div class="top-nav-row">
+        <div class="browser-bar">
+          <div class="browser-prefix no-tr">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>ulogix://</span>
+          </div>
+          <input
+            type="text"
+            id="browser-input"
+            class="browser-input"
+            placeholder="Поиск программы (Python, C++, AutoCAD)..."
+            autocomplete="off"
+            oninput="handleBrowserInput()"
+            onfocus="handleBrowserInput()"
+            onkeydown="handleBrowserKey(event)"
+          />
+          <button id="browser-clear" class="browser-clear no-tr" onclick="clearBrowserSearch()">×</button>
+          <button class="browser-go no-tr" onclick="executeBrowserQuery()">→</button>
+        </div>
+
+        <!-- ВРАЩАЮЩИЙСЯ НЕОНОВЫЙ ХАКЕРСКИЙ ГЛОБУС СМЕНЫ ЯЗЫКА -->
+        <button class="globe-btn no-tr" onclick="toggleLangModal(true)" title="Выбрать язык / Language">
+          <canvas id="hacker-globe" width="60" height="60"></canvas>
+          <span class="globe-lang-code" id="active-lang-code">RU</span>
+        </button>
+      </div>
+
+      <!-- Статус-бар перевода -->
+      <div id="translating-toast" class="translating-toast no-tr">
+        <span>⚡ NEURAL TRANSLATE:</span>
+        <span id="translating-status">Перевод интерфейса...</span>
+      </div>
+
+      <!-- Быстрые закладки браузера -->
+      <div class="browser-bookmarks">
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('cad')">AutoCAD</span>
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('python')">Python</span>
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('c')">C</span>
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('cpp')">C++</span>
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('java')">Java</span>
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('csharp')">C#</span>
+        <span class="bookmark-pill no-tr" onclick="openInternalWeb('https://sharecad.org/ru')">ShareCAD Web</span>
+      </div>
+
+      <!-- Выпадающий список быстрого запуска -->
+      <div id="browser-dropdown" class="browser-dropdown"></div>
+    </div>
+
+    <!-- Шапка с аватаром -->
+    <header>
+      <div class="avatar-ring">
+        <div class="avatar-inner">
+          <img src="avatar.png" alt="NSUMT" onerror="this.style.display='none'" />
+        </div>
+      </div>
+      <div class="badge no-tr">NSUMT & NMMC INITIATIVE</div>
+      <h1 class="no-tr">NSUMT-AI</h1>
+      <p class="subtitle">Инженерная экосистема Ulogix</p>
+    </header>
+
+    <!-- ГЛАВНЫЙ ЭКРАН: СПИСОК ПРОГРАММ -->
+    <div id="view-home" class="view active">
+      <div class="app-list" id="app-list">
+
+        <!-- 1. AutoCAD Studio (с вращающейся чертёжной 3D-плоскостью и отрезками запуска AutoCAD вокруг иконки) -->
+        <div class="app-card" data-keywords="autocad cad dxf dwg чертеж гост автокад" onclick="openView('cad')">
+          <div class="app-icon xenon-cad">
+            <canvas id="cad-splash-icon" width="112" height="112"></canvas>
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+              <path d="M16 3L5 28h5.2l2.3-5.6h7l2.3 5.6H27L16 3zm-1.8 14.5L16 12.6l1.8 4.9h-3.6z" fill="#ff2a55"/>
+              <path d="M16 3L12.5 22.4H10.2L16 3z" fill="#ff8fa3"/>
+              <path d="M9.5 22.4h13l1.2 2.8H8.3l1.2-2.8z" fill="#ff2a55"/>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2 class="no-tr">AutoCAD Studio</h2>
+              <span class="status-pill status-live">Активен</span>
+            </div>
+            <p>2D-чертёжник с экспортом в .DXF, просмотром DWG и рамками ГОСТ</p>
+          </div>
+          <button class="open-btn">Открыть</button>
+        </div>
+
+        <!-- 2. Python -->
+        <div class="app-card" data-keywords="python py пайтон питон код" onclick="openLanguage('python')">
+          <div class="app-icon xenon-python">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path class="py-blue" d="M15.8 3C11.4 3 11.8 4.9 11.8 4.9v2.1h4.2v.7H9.9S7 7.4 7 11.7c0 4.3 2.5 4.2 2.5 4.2h1.5v-2.1s-.1-2.5 2.4-2.5h4.3s2.3.1 2.3-2.2V5.4S20.4 3 15.8 3zm-2.3 1.4c.5 0 .8.4.8.8s-.4.8-.8.8-.8-.4-.8-.8.3-.8.8-.8z" fill="#38bdf8"/>
+              <path class="py-yellow" d="M16.2 29c4.4 0 4-1.9 4-1.9v-2.1h-4.2v-.7h6.1s2.9.3 2.9-4c0-4.3-2.5-4.2-2.5-4.2H21v2.1s.1 2.5-2.4 2.5h-4.3s-2.3-.1-2.3 2.2v3.7S11.6 29 16.2 29zm2.3-1.4c-.5 0-.8-.4-.8-.8s.4-.8.8-.8.8.4.8.8-.3.8-.8.8z" fill="#facc15"/>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2 class="no-tr">Python</h2>
+              <span class="status-pill status-live">Активен</span>
+            </div>
+            <p>Среда Python 3 со стандартными библиотеками и экспортом .py</p>
+          </div>
+          <button class="open-btn">Открыть</button>
+        </div>
+
+        <!-- 3. C -->
+        <div class="app-card" data-keywords="c gcc си язык" onclick="openLanguage('c')">
+          <div class="app-icon xenon-c">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path d="M16 2.5L27.7 9.25V22.75L16 29.5L4.3 22.75V9.25L16 2.5Z" fill="#2563eb"/>
+              <path d="M16 2.5L27.7 9.25V22.75L16 29.5V2.5Z" fill="#1d4ed8"/>
+              <path d="M27.7 9.25L16 16L4.3 9.25L16 2.5L27.7 9.25Z" fill="#60a5fa" opacity="0.55"/>
+              <path d="M19.8 18.6C19.1 19.9 17.7 20.8 16 20.8C13.4 20.8 11.4 18.7 11.4 16C11.4 13.3 13.4 11.2 16 11.2C17.7 11.2 19.1 12.1 19.8 13.4L22.5 11.8C21.2 9.6 18.8 8.1 16 8.1C11.6 8.1 8.2 11.6 8.2 16C8.2 20.4 11.6 23.9 16 23.9C18.8 23.9 21.2 22.4 22.5 20.2L19.8 18.6Z" fill="#ffffff"/>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2 class="no-tr">C</h2>
+              <span class="status-pill status-live">Активен</span>
+            </div>
+            <p>Компилятор GCC со всеми заголовочными файлами и экспортом .c</p>
+          </div>
+          <button class="open-btn">Открыть</button>
+        </div>
+
+        <!-- 4. C++ -->
+        <div class="app-card" data-keywords="c++ cpp g++ stl си плюс" onclick="openLanguage('cpp')">
+          <div class="app-icon xenon-cpp">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path d="M16 2.5L27.7 9.25V22.75L16 29.5L4.3 22.75V9.25L16 2.5Z" fill="#0284c7"/>
+              <path d="M16 2.5L27.7 9.25V22.75L16 29.5V2.5Z" fill="#0369a1"/>
+              <path d="M27.7 9.25L16 16L4.3 9.25L16 2.5L27.7 9.25Z" fill="#38bdf8" opacity="0.6"/>
+              <path d="M17.2 18.3C16.6 19.4 15.4 20.2 14 20.2C11.8 20.2 10.1 18.3 10.1 16C10.1 13.7 11.8 11.8 14 11.8C15.4 11.8 16.6 12.6 17.2 13.7L19.6 12.3C18.5 10.4 16.4 9.1 14 9.1C10.2 9.1 7.2 12.1 7.2 16C7.2 19.9 10.2 22.9 14 22.9C16.4 22.9 18.5 21.6 19.6 19.7L17.2 18.3Z" fill="#ffffff"/>
+              <path d="M21.2 15.2H19.8V13.8H18.7V15.2H17.3V16.3H18.7V17.7H19.8V16.3H21.2V15.2ZM25.8 15.2H24.4V13.8H23.3V15.2H21.9V16.3H23.3V17.7H24.4V16.3H25.8V15.2Z" fill="#ffffff"/>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2 class="no-tr">C++</h2>
+              <span class="status-pill status-live">Активен</span>
+            </div>
+            <p>Компилятор G++ 17, библиотека STL и экспорт программ .cpp</p>
+          </div>
+          <button class="open-btn">Открыть</button>
+        </div>
+
+        <!-- 5. Java -->
+        <div class="app-card" data-keywords="java jdk джава ява" onclick="openLanguage('java')">
+          <div class="app-icon xenon-java">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path class="java-steam" d="M16.5 4C18.5 6.8 14.2 8.8 15.5 11.5C16.3 13.1 18.4 13.8 17.2 16C19.5 13.5 16.8 12.1 16.4 10.2C16 8.3 18.8 6.5 16.5 4Z" fill="#f97316"/>
+              <path class="java-steam" d="M20.2 6.5C21.5 8.5 18.6 10.1 19.6 12.2C20.2 13.4 21.6 14 20.7 15.6C22.4 13.8 20.5 12.7 20.2 11.3C19.9 9.8 21.8 8.4 20.2 6.5Z" fill="#fb923c"/>
+              <path class="java-cup" d="M10.5 18.2C10.5 18.2 9 19 11.8 19.5C15.1 20.1 19.8 19.9 22.2 19.1C22.2 19.1 23.4 19.8 20.8 20.4C16.8 21.3 11.1 21 9.2 19.8C8.2 19.1 10.5 18.2 10.5 18.2Z" fill="#38bdf8"/>
+              <path class="java-cup" d="M11.6 22.1C14.8 22.8 19.4 22.6 21.4 21.8C21.4 21.8 22.3 22.4 20.1 23C16.7 23.8 12.2 23.6 10.6 22.8C9.8 22.4 11.6 22.1 11.6 22.1Z" fill="#38bdf8"/>
+              <path class="java-cup" d="M22.5 16.2C24.3 16.2 25.5 17.2 25.1 18.7C24.7 20 23.1 20.6 21.7 20.8C22.7 20.1 23.7 19.4 23.9 18.4C24.1 17.5 23.3 17.1 22.5 16.2Z" fill="#38bdf8"/>
+              <path class="java-cup" d="M8.5 25.5C13.5 26.8 21.2 26.6 24.5 25.2C24.5 25.2 25.6 26 22.8 26.8C17.8 28.2 10.6 27.8 7.5 26.5C6.6 26 8.5 25.5 8.5 25.5Z" fill="#38bdf8"/>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2 class="no-tr">Java</h2>
+              <span class="status-pill status-live">Активен</span>
+            </div>
+            <p>Среда JDK со стандартными пакетами java.util / math и экспортом .java</p>
+          </div>
+          <button class="open-btn">Открыть</button>
+        </div>
+
+        <!-- 6. C# -->
+        <div class="app-card" data-keywords="c# csharp dotnet си шарп" onclick="openLanguage('csharp')">
+          <div class="app-icon xenon-csharp">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path d="M16 2.5L27.7 9.25V22.75L16 29.5L4.3 22.75V9.25L16 2.5Z" fill="#9333ea"/>
+              <path d="M16 2.5L27.7 9.25V22.75L16 29.5V2.5Z" fill="#7e22ce"/>
+              <path d="M27.7 9.25L16 16L4.3 9.25L16 2.5L27.7 9.25Z" fill="#c084fc" opacity="0.55"/>
+              <path d="M17.5 18.4C16.9 19.5 15.7 20.3 14.3 20.3C12.1 20.3 10.4 18.4 10.4 16C10.4 13.6 12.1 11.7 14.3 11.7C15.7 11.7 16.9 12.5 17.5 13.6L19.9 12.2C18.8 10.3 16.7 9 14.3 9C10.5 9 7.5 12 7.5 16C7.5 20 10.5 23 14.3 23C16.7 23 18.8 21.7 19.9 19.8L17.5 18.4Z" fill="#ffffff"/>
+              <path d="M21.4 13.3H20.4L20.1 14.8H18.9V15.7H19.9L19.7 16.8H18.7V17.7H19.5L19.2 19.2H20.2L20.5 17.7H21.6L21.3 19.2H22.3L22.6 17.7H23.7V16.8H22.8L23 15.7H24V14.8H23.2L23.5 13.3H22.5L22.2 14.8H21.1L21.4 13.3ZM20.9 15.7H22L21.8 16.8H20.7L20.9 15.7Z" fill="#ffffff"/>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2 class="no-tr">C#</h2>
+              <span class="status-pill status-live">Активен</span>
+            </div>
+            <p>Платформа .NET с пространствами имён System и экспортом .cs</p>
+          </div>
+          <button class="open-btn">Открыть</button>
+        </div>
+
+        <!-- 7. Библиотека книг -->
+        <div class="app-card" data-keywords="библиотека книги учебники нггту нгмк литература" onclick="openView('books')">
+          <div class="app-icon xenon-lib">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </div>
+          <div class="app-meta">
+            <div class="app-title-row">
+              <h2>Библиотека книг</h2>
+              <span class="status-pill status-next">Этап 3</span>
+            </div>
+            <p>Учебники НГГТУ, справочники НГМК и техническая литература</p>
+          </div>
+          <button class="open-btn secondary">Скоро</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- МОДУЛЬ ВСТРОЕННОГО ВЕБ-БРАУЗЕРА -->
+    <div id="view-browser" class="view">
+      <div class="top-bar">
+        <button class="back-btn" onclick="openView('home')">← Все программы</button>
+        <span class="no-tr" style="font-size: 12px; color: #38bdf8; font-weight: 700;">ULOGIX BROWSER</span>
+      </div>
+
+      <div class="panel-card">
+        <h3 id="browser-page-title">Встроенный браузер</h3>
+        <p id="browser-page-url" class="no-tr" style="font-family: monospace; color: #7dd3fc;">https://sharecad.org/ru</p>
+
+        <div class="web-frame-wrap">
+          <iframe id="internal-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </div>
+
+        <div class="btn-row">
+          <button class="action-btn outline" onclick="reloadInternalWeb()">↻ Обновить</button>
+          <a id="external-web-link" href="https://sharecad.org/ru" target="_blank" class="action-btn">Открыть в окне ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДУЛЬ: AUTOCAD STUDIO -->
+    <div id="view-cad" class="view">
+      <div class="top-bar">
+        <button class="back-btn" onclick="openView('home')">← Все программы</button>
+        <span class="no-tr" style="font-size: 12px; color: #ff2a55; font-weight: 700; text-shadow: 0 0 10px rgba(255,42,85,0.7);">AUTOCAD STUDIO</span>
+      </div>
+
+      <div class="panel-card">
+        <h3>Встроенный 2D CAD-чертёжник</h3>
+        <p>Проведите пальцем или мышкой по сетке (шаг 10 мм) и скачайте готовый файл .DXF для открытия в AutoCAD или LibreCAD.</p>
+
+        <div class="cad-toolbar">
+          <button class="tool-btn active" onclick="setTool('line', this)">╱ Линия</button>
+          <button class="tool-btn" onclick="setTool('rect', this)">▭ Контур</button>
+          <button class="tool-btn" onclick="setTool('circle', this)">◯ Круг</button>
+          <button class="tool-btn" onclick="undoShape()">↶ Отмена</button>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="cad-canvas"></canvas>
+        </div>
+
+        <div class="coords-bar">
+          <span id="cad-coords" class="no-tr">X: 0 мм | Y: 0 мм</span>
+          <span id="cad-count">Объектов: 0</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="action-btn" onclick="exportToDXF()">⬇ Скачать .DXF</button>
+          <button class="action-btn outline" onclick="clearCanvas()">Очистить лист</button>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h3>Бесплатный просмотр DWG / DXF</h3>
+        <p>Открытие чертежей и сборок прямо во встроенном браузере или внешнем окне.</p>
+        <div class="btn-row">
+          <button class="action-btn" onclick="openInternalWeb('https://sharecad.org/ru')">ShareCAD в боте</button>
+          <a href="https://viewer.autodesk.com" target="_blank" class="action-btn outline">Autodesk Viewer ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДУЛЬ ЯЗЫКА ПРОГРАММИРОВАНИЯ -->
+    <div id="view-ide" class="view">
+      <div class="top-bar">
+        <button class="back-btn" onclick="openView('home')">← Все программы</button>
+        <span id="ide-badge" class="no-tr" style="font-size: 12px; font-weight: 800; letter-spacing: 0.6px;">PYTHON</span>
+      </div>
+
+      <div class="panel-card">
+        <h3 id="ide-title" class="no-tr">Python 3</h3>
+        <p id="ide-desc">Нажмите на нужную библиотеку ниже, чтобы мгновенно подключить её в код.</p>
+
+        <div class="lib-header">
+          <span class="lib-title" id="lib-count-label">Библиотеки языка:</span>
+          <button class="include-all-btn" onclick="includeAllLibraries()">+ Подключить все</button>
+        </div>
+        <div class="lib-grid no-tr" id="lib-grid"></div>
+
+        <textarea id="code-editor" class="code-editor no-tr" spellcheck="false"></textarea>
+
+        <input type="text" id="stdin-input" class="stdin-input" placeholder="Входные данные (stdin) — если программа ждёт ввод..." />
+
+        <div class="btn-row">
+          <button class="action-btn neon-run" id="run-btn" onclick="runCode()">▶ Запустить</button>
+          <button class="action-btn outline" id="download-code-btn" onclick="downloadSourceFile()">⬇ Скачать .py</button>
+        </div>
+
+        <div id="terminal-out" class="terminal-box">Готово к запуску. Нажмите «▶ Запустить»...</div>
+      </div>
+    </div>
+
+    <!-- ЭТАП 3: БИБЛИОТЕКА -->
+    <div id="view-books" class="view">
+      <div class="top-bar">
+        <button class="back-btn" onclick="openView('home')">← Все программы</button>
+        <span class="no-tr" style="font-size: 12px; color: #34d399; font-weight: 700;">NSUMT LIBRARY</span>
+      </div>
+      <div class="panel-card">
+        <h3>Библиотека книг (Этап 3)</h3>
+        <p>База открытых учебников (Open Access), справочников по автоматизации процессов и методических материалов НГГТУ.</p>
+      </div>
+    </div>
+
+    <footer class="no-tr">ULOGIX © 2026 CORE ECOSYSTEM</footer>
+  </div>
+
+  <!-- ПЛАВАЮЩАЯ КНОПКА ПОДДЕРЖКИ СБОКУ -->
+  <button class="support-fab" onclick="toggleSupportModal(true)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+    </svg>
+    <span>Поддержка</span>
+  </button>
+
+  <!-- МОДАЛЬНОЕ ОКНО ВЫБОРА ЯЗЫКА МИРА (110+ ЯЗЫКОВ) -->
+  <div id="lang-modal" class="modal-backdrop" onclick="if(event.target === this) toggleLangModal(false)">
+    <div class="lang-sheet">
+      <div class="support-sheet-head">
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 2px;">Язык интерфейса</h3>
+          <span class="support-online no-tr"><span class="online-dot"></span> GLOBAL NEURAL ENGINE • 110+ LANGUAGES</span>
+        </div>
+        <button class="close-modal-btn no-tr" onclick="toggleLangModal(false)">×</button>
+      </div>
+
+      <input
+        type="text"
+        id="lang-search-input"
+        class="lang-search-input"
+        placeholder="Поиск языка (O‘zbek, English, Türkçe, العربية, 中文)..."
+        oninput="filterWorldLanguages()"
+      />
+
+      <div class="lang-list-scroll no-tr" id="world-lang-grid"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО ПОДДЕРЖКИ -->
+  <div id="support-modal" class="modal-backdrop" onclick="if(event.target === this) toggleSupportModal(false)">
+    <div class="support-sheet">
+      <div class="support-sheet-head">
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 2px;">Поддержка NSUMT-AI</h3>
+          <span class="support-online no-tr"><span class="online-dot"></span> Ulogix Support Online</span>
+        </div>
+        <button class="close-modal-btn no-tr" onclick="toggleSupportModal(false)">×</button>
+      </div>
+
+      <p style="font-size: 12px; color: var(--muted); margin-bottom: 10px;">
+        Выберите тему обращения или опишите проблему — сообщение сразу уйдёт команде разработки.
+      </p>
+
+      <div class="topic-chips">
+        <span class="topic-chip selected" onclick="selectSupportTopic(this)">Ошибка в коде</span>
+        <span class="topic-chip" onclick="selectSupportTopic(this)">Добавить библиотеку</span>
+        <span class="topic-chip" onclick="selectSupportTopic(this)">AutoCAD / .DXF</span>
+        <span class="topic-chip" onclick="selectSupportTopic(this)">Учебники НГГТУ</span>
+      </div>
+
+      <textarea id="support-text" class="support-textarea" placeholder="Напишите ваш вопрос или предложение..."></textarea>
+
+      <div class="btn-row">
+        <button class="action-btn neon-run" onclick="sendSupportMessage()">Отправить в чат</button>
+        <a href="mailto:info@ouoofficial.uz?subject=Support%20NSUMT-AI" class="action-btn outline">Написать на почту</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (tg.setHeaderColor) tg.setHeaderColor('#000000');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#000000');
+    }
+
+    // --- 0. ВРАЩАЮЩАЯСЯ ЧЕРТЁЖНАЯ ЗАСТАВКА ЗАПУСКА AUTOCAD ВОКРУГ ИКОНКИ ---
+    const cadIconCanvas = document.getElementById('cad-splash-icon');
+    const cIconCtx = cadIconCanvas ? cadIconCanvas.getContext('2d') : null;
+    let cadSplashAngle = 0;
+
+    function drawAutoCadSplashIcon() {
+      if (!cIconCtx) return;
+      const w = cadIconCanvas.width;
+      const h = cadIconCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      cIconCtx.clearRect(0, 0, w, h);
+
+      // 1. Вращающаяся 3D-чертёжная плоскость с перспективной сеткой (как при запуске AutoCAD)
+      const planeSize = 35;
+      const tilt = 0.62;
+      const projectPlane = (px, py) => {
+        const rx = px * Math.cos(cadSplashAngle) - py * Math.sin(cadSplashAngle);
+        const ry = px * Math.sin(cadSplashAngle) + py * Math.cos(cadSplashAngle);
+        return {
+          x: cx + rx,
+          y: cy + ry * Math.cos(tilt)
+        };
+      };
+
+      cIconCtx.save();
+      cIconCtx.lineWidth = 1.05;
+      const gridSteps = [-1, -0.33, 0.33, 1];
+      gridSteps.forEach((s, idx) => {
+        const isEdge = (idx === 0 || idx === 3);
+        cIconCtx.strokeStyle = isEdge ? 'rgba(255, 143, 163, 0.7)' : 'rgba(255, 42, 85, 0.3)';
+
+        const p1 = projectPlane(s * planeSize, -planeSize);
+        const p2 = projectPlane(s * planeSize, planeSize);
+        cIconCtx.beginPath();
+        cIconCtx.moveTo(p1.x, p1.y);
+        cIconCtx.lineTo(p2.x, p2.y);
+        cIconCtx.stroke();
+
+        const p3 = projectPlane(-planeSize, s * planeSize);
+        const p4 = projectPlane(planeSize, s * planeSize);
+        cIconCtx.beginPath();
+        cIconCtx.moveTo(p3.x, p3.y);
+        cIconCtx.lineTo(p4.x, p4.y);
+        cIconCtx.stroke();
+      });
+
+      // Угловые маркеры привязки (OSNAP квадраты) на вершинах плоскости
+      const corners = [
+        projectPlane(-planeSize, -planeSize),
+        projectPlane(planeSize, -planeSize),
+        projectPlane(planeSize, planeSize),
+        projectPlane(-planeSize, planeSize)
+      ];
+      corners.forEach(pt => {
+        cIconCtx.strokeStyle = '#ff8fa3';
+        cIconCtx.lineWidth = 1.3;
+        cIconCtx.strokeRect(pt.x - 2.1, pt.y - 2.1, 4.2, 4.2);
+      });
+      cIconCtx.restore();
+
+      // 2. Внешний вращающийся чертёжный контур (пунктирная окружность + градусные засечки)
+      cIconCtx.save();
+      cIconCtx.translate(cx, cy);
+      cIconCtx.rotate(cadSplashAngle * 0.75);
+      cIconCtx.setLineDash([5, 4]);
+      cIconCtx.strokeStyle = 'rgba(255, 143, 163, 0.55)';
+      cIconCtx.lineWidth = 1.15;
+      cIconCtx.beginPath();
+      cIconCtx.arc(0, 0, 46, 0, Math.PI * 2);
+      cIconCtx.stroke();
+      cIconCtx.setLineDash([]);
+
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const r1 = i % 3 === 0 ? 41 : 43.5;
+        const r2 = 48.5;
+        cIconCtx.strokeStyle = i % 3 === 0 ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 42, 85, 0.55)';
+        cIconCtx.lineWidth = i % 3 === 0 ? 1.4 : 1;
+        cIconCtx.beginPath();
+        cIconCtx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+        cIconCtx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+        cIconCtx.stroke();
+      }
+      cIconCtx.restore();
+
+      // 3. Встречно-вращающиеся чертёжные отрезки и дуги с узлами привязки OSNAP
+      cIconCtx.save();
+      cIconCtx.translate(cx, cy);
+      cIconCtx.rotate(-cadSplashAngle * 1.15);
+
+      cIconCtx.strokeStyle = '#ff2a55';
+      cIconCtx.shadowColor = '#ff2a55';
+      cIconCtx.shadowBlur = 8;
+      cIconCtx.lineWidth = 1.8;
+      cIconCtx.beginPath();
+      cIconCtx.arc(0, 0, 37, -0.55, 0.85);
+      cIconCtx.stroke();
+
+      cIconCtx.beginPath();
+      cIconCtx.arc(0, 0, 37, Math.PI - 0.55, Math.PI + 0.85);
+      cIconCtx.stroke();
+
+      // Чертёжные отрезки касательных и хорд
+      cIconCtx.shadowBlur = 4;
+      cIconCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      cIconCtx.lineWidth = 1.15;
+      cIconCtx.beginPath();
+      cIconCtx.moveTo(-35, -15);
+      cIconCtx.lineTo(35, -15);
+      cIconCtx.moveTo(-23, 27);
+      cIconCtx.lineTo(27, -25);
+      cIconCtx.stroke();
+
+      // Точки привязки OSNAP на концах отрезков
+      cIconCtx.fillStyle = '#00f5d4';
+      cIconCtx.beginPath();
+      cIconCtx.arc(-35, -15, 2.2, 0, Math.PI * 2);
+      cIconCtx.arc(35, -15, 2.2, 0, Math.PI * 2);
+      cIconCtx.fill();
+
+      cIconCtx.strokeStyle = '#4ade80';
+      cIconCtx.lineWidth = 1.4;
+      cIconCtx.strokeRect(24.5, -27.5, 4.8, 4.8);
+      cIconCtx.restore();
+
+      cadSplashAngle += 0.022;
+      requestAnimationFrame(drawAutoCadSplashIcon);
+    }
+    drawAutoCadSplashIcon();
+
+    // --- 1. ВРАЩАЮЩИЙСЯ НЕОНОВЫЙ 3D-ГЛОБУС (HACKER STYLE) ---
+    const globeCanvas = document.getElementById('hacker-globe');
+    const gCtx = globeCanvas.getContext('2d');
+    let globeRot = 0;
+
+    function drawHackerGlobe() {
+      const w = globeCanvas.width;
+      const h = globeCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const R = 21;
+      const tilt = 0.34;
+
+      gCtx.clearRect(0, 0, w, h);
+
+      const grad = gCtx.createRadialGradient(cx - 5, cy - 5, 2, cx, cy, R);
+      grad.addColorStop(0, 'rgba(0, 245, 212, 0.28)');
+      grad.addColorStop(0.7, 'rgba(56, 189, 248, 0.12)');
+      grad.addColorStop(1, 'rgba(0, 245, 212, 0.02)');
+      gCtx.fillStyle = grad;
+      gCtx.beginPath();
+      gCtx.arc(cx, cy, R, 0, Math.PI * 2);
+      gCtx.fill();
+
+      gCtx.strokeStyle = 'rgba(0, 245, 212, 0.85)';
+      gCtx.lineWidth = 1.4;
+      gCtx.shadowColor = '#00f5d4';
+      gCtx.shadowBlur = 8;
+      gCtx.beginPath();
+      gCtx.arc(cx, cy, R, 0, Math.PI * 2);
+      gCtx.stroke();
+
+      const project = (lat, lon) => {
+        const x0 = R * Math.cos(lat) * Math.sin(lon);
+        const y0 = R * Math.sin(lat);
+        const z0 = R * Math.cos(lat) * Math.cos(lon);
+        const y1 = y0 * Math.cos(tilt) - z0 * Math.sin(tilt);
+        const z1 = y0 * Math.sin(tilt) + z0 * Math.cos(tilt);
+        return { x: cx + x0, y: cy - y1, z: z1 };
+      };
+
+      const lats = [-0.85, -0.42, 0, 0.42, 0.85];
+      lats.forEach((lat, idx) => {
+        gCtx.beginPath();
+        for (let step = 0; step <= 32; step++) {
+          const lon = (step / 32) * Math.PI * 2;
+          const p = project(lat, lon);
+          if (step === 0) gCtx.moveTo(p.x, p.y);
+          else gCtx.lineTo(p.x, p.y);
+        }
+        gCtx.strokeStyle = idx === 2 ? 'rgba(0, 245, 212, 0.7)' : 'rgba(56, 189, 248, 0.35)';
+        gCtx.lineWidth = idx === 2 ? 1.2 : 0.8;
+        gCtx.stroke();
+      });
+
+      const meridians = 6;
+      for (let m = 0; m < meridians; m++) {
+        const lon = globeRot + (m / meridians) * Math.PI;
+        for (let half = 0; half < 2; half++) {
+          const actualLon = lon + half * Math.PI;
+          gCtx.beginPath();
+          let avgZ = 0;
+          for (let s = 0; s <= 20; s++) {
+            const lat = -Math.PI / 2 + (s / 20) * Math.PI;
+            const p = project(lat, actualLon);
+            avgZ += p.z;
+            if (s === 0) gCtx.moveTo(p.x, p.y);
+            else gCtx.lineTo(p.x, p.y);
+          }
+          const isFront = avgZ > 0;
+          gCtx.strokeStyle = isFront ? 'rgba(0, 245, 212, 0.85)' : 'rgba(0, 245, 212, 0.16)';
+          gCtx.lineWidth = isFront ? 1.15 : 0.7;
+          gCtx.stroke();
+        }
+      }
+
+      const nodes = [
+        { lat: 0.35, lon: globeRot * 1.4 },
+        { lat: -0.45, lon: globeRot * 1.4 + 2.2 },
+        { lat: 0.1, lon: globeRot * 1.4 + 4.3 }
+      ];
+      nodes.forEach(n => {
+        const p = project(n.lat, n.lon);
+        if (p.z > 0) {
+          gCtx.fillStyle = '#ffffff';
+          gCtx.shadowColor = '#00f5d4';
+          gCtx.shadowBlur = 10;
+          gCtx.beginPath();
+          gCtx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
+          gCtx.fill();
+        }
+      });
+
+      gCtx.shadowBlur = 0;
+      globeRot += 0.025;
+      requestAnimationFrame(drawHackerGlobe);
+    }
+    drawHackerGlobe();
+
+    // --- 2. БАЗА ВСЕХ ЯЗЫКОВ МИРА (110+ ЯЗЫКОВ) И НЕЙРОННЫЙ ПЕРЕВОДЧИК ---
+    const WORLD_LANGUAGES = [
+      { code: 'ru', name: 'Русский', en: 'Russian' },
+      { code: 'uz', name: 'O‘zbekcha', en: 'Uzbek' },
+      { code: 'en', name: 'English', en: 'English' },
+      { code: 'tr', name: 'Türkçe', en: 'Turkish' },
+      { code: 'kk', name: 'Қазақша', en: 'Kazakh' },
+      { code: 'tg', name: 'Тоҷикӣ', en: 'Tajik' },
+      { code: 'ky', name: 'Кыргызча', en: 'Kyrgyz' },
+      { code: 'tk', name: 'Türkmençe', en: 'Turkmen' },
+      { code: 'az', name: 'Azərbaycan', en: 'Azerbaijani' },
+      { code: 'tt', name: 'Татарча', en: 'Tatar' },
+      { code: 'de', name: 'Deutsch', en: 'German' },
+      { code: 'fr', name: 'Français', en: 'French' },
+      { code: 'es', name: 'Español', en: 'Spanish' },
+      { code: 'it', name: 'Italiano', en: 'Italian' },
+      { code: 'pt', name: 'Português', en: 'Portuguese' },
+      { code: 'zh-CN', name: '简体中文', en: 'Chinese (Simplified)' },
+      { code: 'zh-TW', name: '繁體中文', en: 'Chinese (Traditional)' },
+      { code: 'ja', name: '日本語', en: 'Japanese' },
+      { code: 'ko', name: '한국어', en: 'Korean' },
+      { code: 'ar', name: 'العربية', en: 'Arabic' },
+      { code: 'fa', name: 'فارسی', en: 'Persian' },
+      { code: 'hi', name: 'हिन्दी', en: 'Hindi' },
+      { code: 'ur', name: 'اردو', en: 'Urdu' },
+      { code: 'bn', name: 'বাংলা', en: 'Bengali' },
+      { code: 'pa', name: 'ਪੰਜਾਬੀ', en: 'Punjabi' },
+      { code: 'id', name: 'Bahasa Indonesia', en: 'Indonesian' },
+      { code: 'ms', name: 'Bahasa Melayu', en: 'Malay' },
+      { code: 'vi', name: 'Tiếng Việt', en: 'Vietnamese' },
+      { code: 'th', name: 'ไทย', en: 'Thai' },
+      { code: 'uk', name: 'Українська', en: 'Ukrainian' },
+      { code: 'be', name: 'Беларуская', en: 'Belarusian' },
+      { code: 'pl', name: 'Polski', en: 'Polish' },
+      { code: 'cs', name: 'Čeština', en: 'Czech' },
+      { code: 'sk', name: 'Slovenčina', en: 'Slovak' },
+      { code: 'bg', name: 'Български', en: 'Bulgarian' },
+      { code: 'sr', name: 'Српски', en: 'Serbian' },
+      { code: 'hr', name: 'Hrvatski', en: 'Croatian' },
+      { code: 'sl', name: 'Slovenščina', en: 'Slovenian' },
+      { code: 'ro', name: 'Română', en: 'Romanian' },
+      { code: 'hu', name: 'Magyar', en: 'Hungarian' },
+      { code: 'el', name: 'Ελληνικά', en: 'Greek' },
+      { code: 'nl', name: 'Nederlands', en: 'Dutch' },
+      { code: 'sv', name: 'Svenska', en: 'Swedish' },
+      { code: 'no', name: 'Norsk', en: 'Norwegian' },
+      { code: 'da', name: 'Dansk', en: 'Danish' },
+      { code: 'fi', name: 'Suomi', en: 'Finnish' },
+      { code: 'et', name: 'Eesti', en: 'Estonian' },
+      { code: 'lv', name: 'Latviešu', en: 'Latvian' },
+      { code: 'lt', name: 'Lietuvių', en: 'Lithuanian' },
+      { code: 'ka', name: 'ქართული', en: 'Georgian' },
+      { code: 'hy', name: 'Հայերեն', en: 'Armenian' },
+      { code: 'he', name: 'עברית', en: 'Hebrew' },
+      { code: 'ps', name: 'پښتو', en: 'Pashto' },
+      { code: 'ku', name: 'Kurdî', en: 'Kurdish' },
+      { code: 'mn', name: 'Монгол', en: 'Mongolian' },
+      { code: 'ne', name: 'नेपाली', en: 'Nepali' },
+      { code: 'si', name: 'සිංහල', en: 'Sinhala' },
+      { code: 'ta', name: 'தமிழ்', en: 'Tamil' },
+      { code: 'te', name: 'తెలుగు', en: 'Telugu' },
+      { code: 'mr', name: 'मराठी', en: 'Marathi' },
+      { code: 'gu', name: 'ગુજરાતી', en: 'Gujarati' },
+      { code: 'kn', name: 'ಕನ್ನಡ', en: 'Kannada' },
+      { code: 'ml', name: 'മലയാളം', en: 'Malayalam' },
+      { code: 'my', name: 'မြန်မာ', en: 'Burmese' },
+      { code: 'km', name: 'ខ្មែរ', en: 'Khmer' },
+      { code: 'lo', name: 'ລາວ', en: 'Lao' },
+      { code: 'tl', name: 'Filipino', en: 'Tagalog' },
+      { code: 'sw', name: 'Kiswahili', en: 'Swahili' },
+      { code: 'am', name: 'አማርኛ', en: 'Amharic' },
+      { code: 'ha', name: 'Hausa', en: 'Hausa' },
+      { code: 'yo', name: 'Yorùbá', en: 'Yoruba' },
+      { code: 'ig', name: 'Igbo', en: 'Igbo' },
+      { code: 'zu', name: 'isiZulu', en: 'Zulu' },
+      { code: 'af', name: 'Afrikaans', en: 'Afrikaans' },
+      { code: 'sq', name: 'Shqip', en: 'Albanian' },
+      { code: 'bs', name: 'Bosanski', en: 'Bosnian' },
+      { code: 'mk', name: 'Македонски', en: 'Macedonian' },
+      { code: 'is', name: 'Íslenska', en: 'Icelandic' },
+      { code: 'ga', name: 'Gaeilge', en: 'Irish' },
+      { code: 'cy', name: 'Cymraeg', en: 'Welsh' },
+      { code: 'gd', name: 'Gàidhlig', en: 'Scottish Gaelic' },
+      { code: 'eu', name: 'Euskara', en: 'Basque' },
+      { code: 'ca', name: 'Català', en: 'Catalan' },
+      { code: 'gl', name: 'Galego', en: 'Galician' },
+      { code: 'mt', name: 'Malti', en: 'Maltese' },
+      { code: 'lb', name: 'Lëtzebuergesch', en: 'Luxembourgish' },
+      { code: 'fy', name: 'Frysk', en: 'Frisian' },
+      { code: 'eo', name: 'Esperanto', en: 'Esperanto' },
+      { code: 'la', name: 'Latina', en: 'Latin' },
+      { code: 'haw', name: 'ʻŌlelo Hawaiʻi', en: 'Hawaiian' },
+      { code: 'mi', name: 'Te Reo Māori', en: 'Maori' },
+      { code: 'sm', name: 'Gagana Samoa', en: 'Samoan' },
+      { code: 'mg', name: 'Malagasy', en: 'Malagasy' },
+      { code: 'so', name: 'Soomaali', en: 'Somali' },
+      { code: 'sn', name: 'chiShona', en: 'Shona' },
+      { code: 'st', name: 'Sesotho', en: 'Sesotho' },
+      { code: 'xh', name: 'isiXhosa', en: 'Xhosa' },
+      { code: 'ny', name: 'Chichewa', en: 'Chichewa' },
+      { code: 'rw', name: 'Kinyarwanda', en: 'Kinyarwanda' },
+      { code: 'ug', name: 'ئۇيغۇرچە', en: 'Uyghur' },
+      { code: 'ce', name: 'Нохчийн', en: 'Chechen' },
+      { code: 'ba', name: 'Башҡортса', en: 'Bashkir' },
+      { code: 'cv', name: 'Чӑвашла', en: 'Chuvash' },
+      { code: 'sah', name: 'Саха тыла', en: 'Yakut' },
+      { code: 'os', name: 'Ирон', en: 'Ossetian' },
+      { code: 'yi', name: 'ייִדיש', en: 'Yiddish' },
+      { code: 'ht', name: 'Kreyòl ayisyen', en: 'Haitian Creole' },
+      { code: 'jv', name: 'Basa Jawa', en: 'Javanese' },
+      { code: 'su', name: 'Basa Sunda', en: 'Sundanese' },
+      { code: 'ceb', name: 'Cebuano', en: 'Cebuano' }
+    ];
+
+    const NATIVE_DICT = {
+      uz: {
+        'Поиск программы (Python, C++, AutoCAD)...': 'Dasturni qidirish (Python, C++, AutoCAD)...',
+        'Инженерная экосистема Ulogix': 'Ulogix muhandislik ekotizimi',
+        'Активен': 'Faol',
+        'Скоро': 'Tez kunda',
+        'Этап 3': '3-bosqich',
+        'Открыть': 'Ochish',
+        '2D-чертёжник с экспортом в .DXF, просмотром DWG и рамками ГОСТ': '.DXF eksporti, DWG ko‘rish va GOST ramkali 2D-chizmachilik',
+        'Среда Python 3 со стандартными библиотеками и экспортом .py': 'Standart kutubxonalar va .py eksportiga ega Python 3 muhiti',
+        'Компилятор GCC со всеми заголовочными файлами и экспортом .c': 'Barcha sarlavha fayllari va .c eksportiga ega GCC kompilyatori',
+        'Компилятор G++ 17, библиотека STL и экспорт программ .cpp': 'G++ 17 kompilyatori, STL kutubxonasi va .cpp dasturlar eksporti',
+        'Среда JDK со стандартными пакетами java.util / math и экспортом .java': 'Standart java.util / math paketlari va .java eksportli JDK muhiti',
+        'Платформа .NET с пространствами имён System и экспортом .cs': 'System nomlar fazosi va .cs eksportiga ega .NET platformasi',
+        'Учебники НГГТУ, справочники НГМК и техническая литература': 'NDKTU darsliklari, NKMK ma’lumotnomalari va texnik adabiyotlar',
+        '← Все программы': '← Barcha dasturlar',
+        'Поддержка': 'Qo‘llab-quvvatlash',
+        'Язык интерфейса': 'Interfeys tili',
+        'Поиск языка (O‘zbek, English, Türkçe, العربية, 中文)...': 'Tilni qidirish (O‘zbek, Русский, English, Türkçe)...',
+        'Встроенный 2D CAD-чертёжник': 'O‘rnatilgan 2D CAD-chizmachilik',
+        'Проведите пальцем или мышкой по сетке (шаг 10 мм) и скачайте готовый файл .DXF для открытия в AutoCAD или LibreCAD.': 'To‘r bo‘ylab (10 mm qadam) barmoq yoki sichqoncha bilan chizing va AutoCAD yoki LibreCAD’da ochish uchun tayyor .DXF faylini yuklab oling.',
+        '╱ Линия': '╱ Chiziq',
+        '▭ Контур': '▭ Kontur',
+        '◯ Круг': '◯ Doira',
+        '↶ Отмена': '↶ Bekor qilish',
+        '⬇ Скачать .DXF': '⬇ .DXF yuklab olish',
+        'Очистить лист': 'Varaqni tozalash',
+        'Бесплатный просмотр DWG / DXF': 'DWG / DXF fayllarini bepul ko‘rish',
+        'Открытие чертежей и сборок прямо во встроенном браузере или внешнем окне.': 'Chizma va yig‘malarni to‘g‘ridan-to‘g‘ri ichki brauzerda yoki tashqi oynada ochish.',
+        'ShareCAD в боте': 'Bot ichida ShareCAD',
+        'Autodesk Viewer ↗': 'Autodesk Viewer ↗',
+        'Нажмите на нужную библиотеку ниже, чтобы мгновенно подключить её в код.': 'Kodga bir zumda ulash uchun quyidagi kerakli kutubxonani bosing.',
+        '+ Подключить все': '+ Barchasini ulash',
+        'Входные данные (stdin) — если программа ждёт ввод...': 'Kirish ma’lumotlari (stdin) — dastur kiritishni kutayotgan bo‘lsa...',
+        '▶ Запустить': '▶ Ishga tushirish',
+        'Готово к запуску. Нажмите «▶ Запустить»...': 'Ishga tushirishga tayyor. «▶ Ishga tushirish» tugmasini bosing...',
+        'Встроенный браузер': 'Ichki brauzer',
+        '↻ Обновить': '↻ Yangilash',
+        'Открыть в окне ↗': 'Oynada ochish ↗',
+        'Библиотека книг (Этап 3)': 'Kitoblar kutubxonasi (3-bosqich)',
+        'База открытых учебников (Open Access), справочников по автоматизации процессов и методических материалов НГГТУ.': 'Ochiq darsliklar (Open Access), jarayonlarni avtomatlashtirish ma’lumotnomalari va NDKTU uslubiy materiallari bazasi.',
+        'Поддержка NSUMT-AI': 'NSUMT-AI qo‘llab-quvvatlash',
+        'Выберите тему обращения или опишите проблему — сообщение сразу уйдёт команде разработки.': 'Murojaat mavzusini tanlang yoki muammoni yozing — xabar darhol ishlab chiquvchilar jamoasiga yuboriladi.',
+        'Ошибка в коде': 'Koddagi xatolik',
+        'Добавить библиотеку': 'Kutubxona qo‘shish',
+        'Учебники НГГТУ': 'NDKTU darsliklari',
+        'Напишите ваш вопрос или предложение...': 'Savolingiz yoki taklifingizni yozing...',
+        'Отправить в чат': 'Chatga yuborish',
+        'Написать на почту': 'Pochtaga yozish'
+      },
+      en: {
+        'Поиск программы (Python, C++, AutoCAD)...': 'Search program (Python, C++, AutoCAD)...',
+        'Инженерная экосистема Ulogix': 'Ulogix Engineering Ecosystem',
+        'Активен': 'Active',
+        'Скоро': 'Soon',
+        'Этап 3': 'Stage 3',
+        'Открыть': 'Open',
+        '2D-чертёжник с экспортом в .DXF, просмотром DWG и рамками ГОСТ': '2D CAD drafter with .DXF export, DWG viewer & GOST frames',
+        'Среда Python 3 со стандартными библиотеками и экспортом .py': 'Python 3 environment with standard libraries & .py export',
+        'Компилятор GCC со всеми заголовочными файлами и экспортом .c': 'GCC compiler with all standard headers & .c export',
+        'Компилятор G++ 17, библиотека STL и экспорт программ .cpp': 'G++ 17 compiler, STL library & .cpp program export',
+        'Среда JDK со стандартными пакетами java.util / math и экспортом .java': 'JDK runtime with java.util / math packages & .java export',
+        'Платформа .NET с пространствами имён System и экспортом .cs': '.NET runtime with System namespaces & .cs file export',
+        'Учебники НГГТУ, справочники НГМК и техническая литература': 'NSUMT textbooks, NMMC handbooks & engineering literature',
+        '← Все программы': '← All programs',
+        'Поддержка': 'Support',
+        'Язык интерфейса': 'Interface Language',
+        'Поиск языка (O‘zbek, English, Türkçe, العربية, 中文)...': 'Search language (English, O‘zbek, Türkçe, العربية, 中文)...',
+        'Встроенный 2D CAD-чертёжник': 'Built-in 2D CAD Drafter',
+        'Проведите пальцем или мышкой по сетке (шаг 10 мм) и скачайте готовый файл .DXF для открытия в AutoCAD или LibreCAD.': 'Drag on the grid (10 mm step) and download a ready .DXF file for AutoCAD or LibreCAD.',
+        '╱ Линия': '╱ Line',
+        '▭ Контур': '▭ Rectangle',
+        '◯ Круг': '◯ Circle',
+        '↶ Отмена': '↶ Undo',
+        '⬇ Скачать .DXF': '⬇ Download .DXF',
+        'Очистить лист': 'Clear sheet',
+        'Бесплатный просмотр DWG / DXF': 'Free DWG / DXF Viewer',
+        'Открытие чертежей и сборок прямо во встроенном браузере или внешнем окне.': 'Open drawings and assemblies directly in the built-in browser or external tab.',
+        'ShareCAD в боте': 'ShareCAD in App',
+        'Autodesk Viewer ↗': 'Autodesk Viewer ↗',
+        'Нажмите на нужную библиотеку ниже, чтобы мгновенно подключить её в код.': 'Tap any library below to inject it directly into your code.',
+        '+ Подключить все': '+ Include All',
+        'Входные данные (stdin) — если программа ждёт ввод...': 'Standard input (stdin) — if program expects user input...',
+        '▶ Запустить': '▶ Run Code',
+        'Готово к запуску. Нажмите «▶ Запустить»...': 'Ready to run. Click "▶ Run Code"...',
+        'Встроенный браузер': 'Built-in Browser',
+        '↻ Обновить': '↻ Reload',
+        'Открыть в окне ↗': 'Open externally ↗',
+        'Библиотека книг (Этап 3)': 'Book Library (Stage 3)',
+        'База открытых учебников (Open Access), справочников по автоматизации процессов и методических материалов НГГТУ.': 'Open Access textbooks, process automation handbooks & NSUMT study materials.',
+        'Поддержка NSUMT-AI': 'NSUMT-AI Support',
+        'Выберите тему обращения или опишите проблему — сообщение сразу уйдёт команде разработки.': 'Select a topic or describe your issue — it will be sent straight to the dev team.',
+        'Ошибка в коде': 'Code Error',
+        'Добавить библиотеку': 'Request Library',
+        'Учебники НГГТУ': 'NSUMT Textbooks',
+        'Напишите ваш вопрос или предложение...': 'Write your question or suggestion...',
+        'Отправить в чат': 'Send to Chat',
+        'Написать на почту': 'Send Email'
+      }
+    };
+
+    const PROTECTED_TOKENS = [
+      'NSUMT-AI', 'Ulogix', 'AutoCAD Studio', 'AutoCAD', 'LibreCAD', 'ShareCAD',
+      'Autodesk Viewer', 'Python 3', 'Python', 'C++ 17', 'C++', 'G++ 17', 'GCC',
+      'Java', 'OpenJDK', 'C#', '.NET', '.DXF', 'DWG', '.py', '.cpp', '.java', '.cs', '.c',
+      'stdin', 'STL', 'JDK', 'System', 'java.util', 'math'
+    ];
+
+    let currentAppLang = 'ru';
+    const translationCache = { ru: {} };
+    let domObserver = null;
+    let isApplyingTranslation = false;
+
+    try {
+      const savedLang = localStorage.getItem('ulogix_app_lang');
+      if (savedLang) currentAppLang = savedLang;
+    } catch (e) {}
+
+    function loadLangCache(lang) {
+      if (translationCache[lang]) return translationCache[lang];
+      let stored = {};
+      try {
+        const raw = localStorage.getItem('ulogix_tr_cache_' + lang);
+        if (raw) stored = JSON.parse(raw);
+      } catch (e) {}
+      translationCache[lang] = Object.assign({}, NATIVE_DICT[lang] || {}, stored);
+      return translationCache[lang];
+    }
+
+    function saveLangCache(lang) {
+      try {
+        localStorage.setItem('ulogix_tr_cache_' + lang, JSON.stringify(translationCache[lang] || {}));
+      } catch (e) {}
+    }
+
+    function trDynamic(ruStr) {
+      if (currentAppLang === 'ru' || !ruStr) return ruStr;
+      const cache = loadLangCache(currentAppLang);
+      if (cache[ruStr]) return cache[ruStr];
+      batchTranslateStrings([ruStr], currentAppLang);
+      return ruStr;
+    }
+
+    function maskTokens(text) {
+      let masked = text;
+      const used = [];
+      PROTECTED_TOKENS.forEach((tok) => {
+        if (masked.includes(tok)) {
+          const idx = used.length;
+          used.push(tok);
+          masked = masked.split(tok).join(`[[${idx}]]`);
+        }
+      });
+      return { masked, used };
+    }
+
+    function unmaskTokens(text, used) {
+      let res = text;
+      used.forEach((tok, idx) => {
+        res = res.replace(new RegExp(`\\[\\[\\s*${idx}\\s*\\]\\]`, 'g'), tok);
+      });
+      return res;
+    }
+
+    async function batchTranslateStrings(strings, targetLang) {
+      const cache = loadLangCache(targetLang);
+      const missing = [...new Set(strings)].filter(s => s && s.trim().length > 0 && !cache[s]);
+      if (missing.length === 0) return;
+
+      const toast = document.getElementById('translating-toast');
+      toast.classList.add('active');
+
+      try {
+        for (let i = 0; i < missing.length; i += 18) {
+          const chunk = missing.slice(i, i + 18);
+          const maskedList = chunk.map(s => maskTokens(s));
+          const joined = maskedList.map(m => m.masked).join('\n|||\n');
+
+          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(joined)}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data && Array.isArray(data[0])) {
+            const fullTranslated = data[0].map(part => part[0]).join('');
+            const parts = fullTranslated.split(/\n?\s*\|\|\|\s*\n?/);
+
+            chunk.forEach((origStr, idx) => {
+              if (parts[idx]) {
+                const clean = unmaskTokens(parts[idx].trim(), maskedList[idx].used);
+                cache[origStr] = clean;
+              }
+            });
+          }
+        }
+        saveLangCache(targetLang);
+      } catch (e) {
+      } finally {
+        toast.classList.remove('active');
+      }
+    }
+
+    async function applyLanguageToDOM(targetLang) {
+      currentAppLang = targetLang;
+      try { localStorage.setItem('ulogix_app_lang', targetLang); } catch (e) {}
+
+      const shortCode = targetLang.split('-')[0].toUpperCase();
+      document.getElementById('active-lang-code').textContent = shortCode;
+      document.documentElement.lang = targetLang;
+
+      const textNodes = [];
+      const placeholders = [];
+      const stringsToTranslate = [];
+
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          if (parent.closest('.no-tr, script, style, textarea')) return NodeFilter.FILTER_REJECT;
+          const val = node.nodeValue;
+          if (!val || !val.trim()) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+
+      let n;
+      while ((n = walker.nextNode())) {
+        if (n._origRu === undefined) {
+          n._origRu = n.nodeValue;
+        }
+        const trimmed = n._origRu.trim();
+        if (trimmed.length > 0 && !/^[\d\s.,:;+\-*/=<>()[\]{}•→←↗⬇▶↻✓×]+$/.test(trimmed)) {
+          textNodes.push(n);
+          stringsToTranslate.push(trimmed);
+        }
+      }
+
+      document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+        if (el.closest('.no-tr')) return;
+        if (!el.dataset.origPlaceholder) {
+          el.dataset.origPlaceholder = el.placeholder;
+        }
+        placeholders.push(el);
+        stringsToTranslate.push(el.dataset.origPlaceholder);
+      });
+
+      if (targetLang !== 'ru') {
+        await batchTranslateStrings(stringsToTranslate, targetLang);
+      }
+
+      const cache = loadLangCache(targetLang);
+      isApplyingTranslation = true;
+
+      textNodes.forEach(node => {
+        const orig = node._origRu;
+        const trimmed = orig.trim();
+        if (targetLang === 'ru') {
+          node.nodeValue = orig;
+        } else if (cache[trimmed]) {
+          const lead = orig.match(/^\s*/)[0];
+          const trail = orig.match(/\s*$/)[0];
+          node.nodeValue = lead + cache[trimmed] + trail;
+        }
+      });
+
+      placeholders.forEach(el => {
+        const orig = el.dataset.origPlaceholder;
+        if (targetLang === 'ru') {
+          el.placeholder = orig;
+        } else if (cache[orig]) {
+          el.placeholder = cache[orig];
+        }
+      });
+
+      isApplyingTranslation = false;
+      renderWorldLanguages(document.getElementById('lang-search-input').value);
+    }
+
+    function startTranslationObserver() {
+      if (domObserver) return;
+      domObserver = new MutationObserver(() => {
+        if (isApplyingTranslation || currentAppLang === 'ru') return;
+        applyLanguageToDOM(currentAppLang);
+      });
+      domObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    function toggleLangModal(show) {
+      const modal = document.getElementById('lang-modal');
+      modal.classList.toggle('open', show);
+      if (show) {
+        renderWorldLanguages(document.getElementById('lang-search-input').value);
+      }
+    }
+
+    function filterWorldLanguages() {
+      const q = document.getElementById('lang-search-input').value;
+      renderWorldLanguages(q);
+    }
+
+    function renderWorldLanguages(query = '') {
+      const grid = document.getElementById('world-lang-grid');
+      if (!grid) return;
+      const q = query.trim().toLowerCase();
+
+      const filtered = WORLD_LANGUAGES.filter(l =>
+        !q ||
+        l.name.toLowerCase().includes(q) ||
+        l.en.toLowerCase().includes(q) ||
+        l.code.toLowerCase().includes(q)
+      );
+
+      grid.innerHTML = filtered.map(l => `
+        <button class="lang-option ${l.code === currentAppLang ? 'selected' : ''}" onclick="selectWorldLanguage('${l.code}')">
+          <div>
+            <span class="lang-native">${l.name}</span>
+            <span class="lang-sub">${l.en}</span>
+          </div>
+          <span class="lang-iso">${l.code.split('-')[0].toUpperCase()}</span>
+        </button>
+      `).join('');
+    }
+
+    async function selectWorldLanguage(code) {
+      toggleLangModal(false);
+      await applyLanguageToDOM(code);
+    }
+
+    // --- 3. АНИМИРОВАННЫЙ ФОН С МЕРЦАЮЩИМИ ЗВЁЗДАМИ ---
+    const starCanvas = document.getElementById('stars');
+    const starCtx = starCanvas.getContext('2d');
+    let starList = [];
+
+    function initStars() {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+      const count = Math.min(95, Math.floor((starCanvas.width * starCanvas.height) / 9000));
+      starList = [];
+      for (let i = 0; i < count; i++) {
+        starList.push({
+          x: Math.random() * starCanvas.width,
+          y: Math.random() * starCanvas.height,
+          r: Math.random() * 1.5 + 0.4,
+          phase: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.04 + 0.015,
+          isSparkle: Math.random() > 0.82
+        });
+      }
+    }
+
+    function animateStars() {
+      starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+      for (let i = 0; i < starList.length; i++) {
+        const s = starList[i];
+        s.phase += s.speed;
+        const alpha = 0.12 + 0.88 * ((Math.sin(s.phase) + 1) / 2);
+
+        starCtx.save();
+        starCtx.globalAlpha = alpha;
+        starCtx.fillStyle = '#ffffff';
+        starCtx.shadowColor = '#ffffff';
+        starCtx.shadowBlur = s.isSparkle ? 8 : 4;
+
+        starCtx.beginPath();
+        starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        starCtx.fill();
+
+        if (s.isSparkle && alpha > 0.65) {
+          const len = s.r * 3.8 * alpha;
+          starCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+          starCtx.lineWidth = 0.7;
+          starCtx.beginPath();
+          starCtx.moveTo(s.x - len, s.y);
+          starCtx.lineTo(s.x + len, s.y);
+          starCtx.moveTo(s.x, s.y - len);
+          starCtx.lineTo(s.x, s.y + len);
+          starCtx.stroke();
+        }
+        starCtx.restore();
+      }
+      requestAnimationFrame(animateStars);
+    }
+
+    initStars();
+    animateStars();
+    window.addEventListener('resize', initStars);
+
+    // --- 4. ВСТРОЕННЫЙ БРАУЗЕР И БЫСТРЫЙ ПОИСК ПРОГРАММ ---
+    const APPS_INDEX = [
+      { id: 'cad', title: 'AutoCAD Studio', sub: '2D-чертёжник, .DXF и ГОСТ', color: '#ff2a55', keys: ['autocad', 'cad', 'dxf', 'dwg', 'автокад', 'чертеж'], run: () => openView('cad') },
+      { id: 'python', title: 'Python 3', sub: 'Среда Python + библиотеки (.py)', color: '#facc15', keys: ['python', 'py', 'пайтон', 'питон'], run: () => openLanguage('python') },
+      { id: 'c', title: 'C (GCC)', sub: 'Компилятор GCC (.c)', color: '#60a5fa', keys: ['c', 'gcc', 'си'], run: () => openLanguage('c') },
+      { id: 'cpp', title: 'C++ 17 (G++)', sub: 'Компилятор G++ и STL (.cpp)', color: '#22d3ee', keys: ['c++', 'cpp', 'g++', 'stl', 'си++'], run: () => openLanguage('cpp') },
+      { id: 'java', title: 'Java (OpenJDK)', sub: 'Среда JDK (.java)', color: '#fb923c', keys: ['java', 'jdk', 'джава', 'ява'], run: () => openLanguage('java') },
+      { id: 'csharp', title: 'C# (.NET)', sub: 'Платформа .NET (.cs)', color: '#c084fc', keys: ['c#', 'csharp', 'dotnet', 'шарп'], run: () => openLanguage('csharp') },
+      { id: 'books', title: 'Библиотека книг', sub: 'Учебники НГГТУ и справочники НГМК', color: '#34d399', keys: ['библиотека', 'книги', 'учебники', 'нггту', 'нгмк'], run: () => openView('books') }
+    ];
+
+    function handleBrowserInput() {
+      const input = document.getElementById('browser-input');
+      const clearBtn = document.getElementById('browser-clear');
+      const dropdown = document.getElementById('browser-dropdown');
+      const raw = input.value.trim();
+      const q = raw.toLowerCase();
+
+      clearBtn.style.display = raw.length > 0 ? 'flex' : 'none';
+
+      document.querySelectorAll('#app-list .app-card').forEach(card => {
+        const kw = card.getAttribute('data-keywords') || '';
+        card.classList.toggle('hidden-by-search', q.length > 0 && !kw.includes(q));
+      });
+
+      if (!q) {
+        dropdown.classList.remove('open');
+        dropdown.innerHTML = '';
+        return;
+      }
+
+      const matches = APPS_INDEX.filter(app =>
+        app.title.toLowerCase().includes(q) || app.keys.some(k => k.includes(q) || q.includes(k))
+      );
+
+      let html = '';
+      matches.forEach(app => {
+        html += `
+          <div class="search-item" onclick="quickLaunch('${app.id}')">
+            <div class="search-item-left">
+              <span class="search-dot" style="background:${app.color}; box-shadow: 0 0 8px ${app.color};"></span>
+              <div>
+                <div class="search-item-title no-tr">${app.title}</div>
+                <div class="search-item-sub">${trDynamic(app.sub)}</div>
+              </div>
+            </div>
+            <span class="search-item-go">${trDynamic('Открыть')} ↗</span>
+          </div>
+        `;
+      });
+
+      if (q.includes('.') && !q.startsWith('.')) {
+        const targetUrl = raw.startsWith('http') ? raw : 'https://' + raw;
+        html += `
+          <div class="search-item" onclick="openInternalWeb('${targetUrl}')">
+            <div class="search-item-left">
+              <span class="search-dot" style="background:#38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <div>
+                <div class="search-item-title">${trDynamic('Открыть сайт в браузере бота')}</div>
+                <div class="search-item-sub no-tr">${targetUrl}</div>
+              </div>
+            </div>
+            <span class="search-item-go">→</span>
+          </div>
+        `;
+      }
+
+      if (!html) {
+        html = `<div style="padding: 10px 12px; font-size: 12px; color: #8e8e93;">${trDynamic('Ничего не найдено по запросу')} «${raw}»</div>`;
+      }
+
+      dropdown.innerHTML = html;
+      dropdown.classList.add('open');
+    }
+
+    function handleBrowserKey(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        executeBrowserQuery();
+      }
+    }
+
+    function executeBrowserQuery() {
+      const raw = document.getElementById('browser-input').value.trim();
+      const q = raw.toLowerCase();
+      document.getElementById('browser-dropdown').classList.remove('open');
+
+      if (!q) return;
+
+      const exact = APPS_INDEX.find(app =>
+        app.id === q || app.title.toLowerCase() === q || app.keys.some(k => k === q)
+      ) || APPS_INDEX.find(app =>
+        app.title.toLowerCase().includes(q) || app.keys.some(k => k.includes(q))
+      );
+
+      if (exact) {
+        exact.run();
+        return;
+      }
+
+      if (q.includes('.')) {
+        const targetUrl = raw.startsWith('http') ? raw : 'https://' + raw;
+        openInternalWeb(targetUrl);
+      }
+    }
+
+    function quickLaunch(id) {
+      const app = APPS_INDEX.find(a => a.id === id);
+      document.getElementById('browser-dropdown').classList.remove('open');
+      if (app) {
+        document.getElementById('browser-input').value = app.title;
+        document.getElementById('browser-clear').style.display = 'flex';
+        app.run();
+      }
+    }
+
+    function clearBrowserSearch() {
+      document.getElementById('browser-input').value = '';
+      document.getElementById('browser-clear').style.display = 'none';
+      document.getElementById('browser-dropdown').classList.remove('open');
+      document.querySelectorAll('#app-list .app-card').forEach(card => card.classList.remove('hidden-by-search'));
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.browser-bar-wrap')) {
+        document.getElementById('browser-dropdown').classList.remove('open');
+      }
+    });
+
+    let currentBrowserUrl = 'https://sharecad.org/ru';
+    function openInternalWeb(url) {
+      currentBrowserUrl = url;
+      document.getElementById('browser-dropdown').classList.remove('open');
+      document.getElementById('browser-page-url').textContent = url;
+      document.getElementById('external-web-link').href = url;
+      document.getElementById('internal-iframe').src = url;
+      openView('browser');
+    }
+
+    function reloadInternalWeb() {
+      document.getElementById('internal-iframe').src = currentBrowserUrl;
+    }
+
+    // --- 5. ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ---
+    function openView(name) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + name).classList.add('active');
+      if (name === 'cad') initCadCanvas();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- 6. ПОДДЕРЖКА (САППОРТ) ---
+    let selectedTopic = 'Ошибка в коде';
+
+    function toggleSupportModal(show) {
+      const modal = document.getElementById('support-modal');
+      modal.classList.toggle('open', show);
+    }
+
+    function selectSupportTopic(el) {
+      document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedTopic = el.textContent;
+    }
+
+    function sendSupportMessage() {
+      const text = document.getElementById('support-text').value.trim();
+      const payload = `[Support NSUMT-AI | ${selectedTopic}] ${text || 'Help needed'}`;
+
+      if (tg && tg.openTelegramLink) {
+        tg.openTelegramLink(`https://t.me/NSUMT_AI_bot?start=support`);
+      } else {
+        window.open(`https://t.me/NSUMT_AI_bot?text=${encodeURIComponent(payload)}`, '_blank');
+      }
+      document.getElementById('support-text').value = '';
+      toggleSupportModal(false);
+    }
+
+    // --- 7. AUTOCAD 2D ЧЕРТЁЖНИК + DXF ЭКСПОРТ ---
+    const cadCanvas = document.getElementById('cad-canvas');
+    const cadCtx = cadCanvas.getContext('2d');
+    const GRID_PX = 20;
+    let cadInitialized = false;
+    let currentTool = 'line';
+    let shapes = [];
+    let isDrawing = false;
+    let startPt = null;
+    let currentPt = null;
+
+    function snap(v) {
+      return Math.round(v / GRID_PX) * GRID_PX;
+    }
+
+    function setTool(tool, btn) {
+      currentTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function initCadCanvas() {
+      cadCanvas.width = cadCanvas.parentElement.clientWidth;
+      cadCanvas.height = 270;
+      drawCad();
+
+      if (cadInitialized) return;
+      cadInitialized = true;
+
+      const getPos = (e) => {
+        const r = cadCanvas.getBoundingClientRect();
+        return {
+          x: snap(e.clientX - r.left),
+          y: snap(e.clientY - r.top)
+        };
+      };
+
+      cadCanvas.addEventListener('pointerdown', (e) => {
+        cadCanvas.setPointerCapture(e.pointerId);
+        isDrawing = true;
+        startPt = getPos(e);
+        currentPt = startPt;
+      });
+
+      cadCanvas.addEventListener('pointermove', (e) => {
+        const pt = getPos(e);
+        const mmX = (pt.x / GRID_PX) * 10;
+        const mmY = ((cadCanvas.height - pt.y) / GRID_PX) * 10;
+        document.getElementById('cad-coords').textContent = `X: ${Math.round(mmX)} mm | Y: ${Math.round(mmY)} mm`;
+
+        if (!isDrawing) return;
+        currentPt = pt;
+        drawCad();
+        drawShape({ type: currentTool, x1: startPt.x, y1: startPt.y, x2: currentPt.x, y2: currentPt.y }, '#ff2a55');
+      });
+
+      cadCanvas.addEventListener('pointerup', () => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (startPt && currentPt && (startPt.x !== currentPt.x || startPt.y !== currentPt.y)) {
+          shapes.push({ type: currentTool, x1: startPt.x, y1: startPt.y, x2: currentPt.x, y2: currentPt.y });
+        }
+        startPt = null;
+        currentPt = null;
+        drawCad();
+      });
+    }
+
+    function drawShape(s, color = '#38bdf8') {
+      cadCtx.strokeStyle = color;
+      cadCtx.lineWidth = 2;
+      cadCtx.beginPath();
+
+      if (s.type === 'line') {
+        cadCtx.moveTo(s.x1, s.y1);
+        cadCtx.lineTo(s.x2, s.y2);
+      } else if (s.type === 'rect') {
+        cadCtx.rect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+      } else if (s.type === 'circle') {
+        const r = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+        cadCtx.arc(s.x1, s.y1, r, 0, Math.PI * 2);
+      }
+      cadCtx.stroke();
+    }
+
+    function drawCad() {
+      const w = cadCanvas.width;
+      const h = cadCanvas.height;
+      cadCtx.clearRect(0, 0, w, h);
+
+      cadCtx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      cadCtx.lineWidth = 1;
+      for (let x = 0; x <= w; x += GRID_PX) {
+        cadCtx.beginPath();
+        cadCtx.moveTo(x, 0);
+        cadCtx.lineTo(x, h);
+        cadCtx.stroke();
+      }
+      for (let y = 0; y <= h; y += GRID_PX) {
+        cadCtx.beginPath();
+        cadCtx.moveTo(0, y);
+        cadCtx.lineTo(w, y);
+        cadCtx.stroke();
+      }
+
+      shapes.forEach(s => drawShape(s));
+      const countEl = document.getElementById('cad-count');
+      countEl._origRu = `Объектов: ${shapes.length}`;
+      countEl.textContent = `${trDynamic('Объектов')}: ${shapes.length}`;
+    }
+
+    function undoShape() {
+      shapes.pop();
+      drawCad();
+    }
+
+    function clearCanvas() {
+      shapes = [];
+      drawCad();
+    }
+
+    function exportToDXF() {
+      if (!shapes.length) {
+        alert(trDynamic('Сначала нарисуйте хотя бы один элемент на сетке.'));
+        return;
+      }
+
+      const toMM_X = (px) => ((px / GRID_PX) * 10).toFixed(2);
+      const toMM_Y = (py) => (((cadCanvas.height - py) / GRID_PX) * 10).toFixed(2);
+
+      let entities = [];
+      const addLine = (x1, y1, x2, y2) => {
+        entities.push('0', 'LINE', '8', '0', '10', x1, '20', y1, '11', x2, '21', y2);
+      };
+
+      shapes.forEach(s => {
+        const x1 = toMM_X(s.x1), y1 = toMM_Y(s.y1);
+        const x2 = toMM_X(s.x2), y2 = toMM_Y(s.y2);
+
+        if (s.type === 'line') {
+          addLine(x1, y1, x2, y2);
+        } else if (s.type === 'rect') {
+          addLine(x1, y1, x2, y1);
+          addLine(x2, y1, x2, y2);
+          addLine(x2, y2, x1, y2);
+          addLine(x1, y2, x1, y1);
+        } else if (s.type === 'circle') {
+          const r = ((Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / GRID_PX) * 10).toFixed(2);
+          entities.push('0', 'CIRCLE', '8', '0', '10', x1, '20', y1, '40', r);
+        }
+      });
+
+      const dxfContent = ['0', 'SECTION', '2', 'ENTITIES', ...entities, '0', 'ENDSEC', '0', 'EOF'].join('\n');
+      const blob = new Blob([dxfContent], { type: 'application/dxf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'drawing_nsumt_ulogix.dxf';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // --- 8. КОНФИГУРАЦИЯ ЯЗЫКОВ ПРОГРАММИРОВАНИЯ ---
+    let currentLang = 'python';
+    let tabListenerAdded = false;
+
+    const LANGUAGES = {
+      python: {
+        name: 'Python 3',
+        badge: 'PYTHON 3.10+',
+        color: '#facc15',
+        piston: 'python',
+        ext: 'py',
+        filename: 'program.py',
+        libs: [
+          'import math', 'import cmath', 'import statistics', 'import random',
+          'import decimal', 'import fractions', 'import itertools', 'import functools',
+          'import collections', 'import datetime', 'import json', 'import re',
+          'import os', 'import sys', 'import hashlib', 'import heapq', 'import bisect', 'import csv'
+        ],
+        template: `import math\nimport statistics\nimport random\n\n# NSUMT-AI Python 3\nvalues = [14.2, 18.6, 15.9, 21.4, 17.1]\nmean_val = statistics.mean(values)\nprint(f"Data: {values}")\nprint(f"Mean: {mean_val:.3f}")\nprint(f"Sqrt: {math.sqrt(mean_val):.4f}")`
+      },
+      c: {
+        name: 'C (GCC Compiler)',
+        badge: 'C / GCC',
+        color: '#60a5fa',
+        piston: 'c',
+        ext: 'c',
+        filename: 'program.c',
+        libs: [
+          '#include <stdio.h>', '#include <stdlib.h>', '#include <math.h>', '#include <string.h>',
+          '#include <ctype.h>', '#include <stdbool.h>', '#include <time.h>', '#include <limits.h>',
+          '#include <float.h>', '#include <stdint.h>', '#include <assert.h>', '#include <complex.h>'
+        ],
+        template: `#include <stdio.h>\n#include <stdlib.h>\n#include <math.h>\n#include <string.h>\n\nint main() {\n    double x = 5.0, y = 12.0;\n    double res = hypot(x, y);\n    printf("C (GCC) OK!\\n");\n    printf("Hypotenuse (%.1f, %.1f) = %.2f\\n", x, y, res);\n    return 0;\n}`
+      },
+      cpp: {
+        name: 'C++ 17 (G++ STL)',
+        badge: 'C++ / G++ 17',
+        color: '#22d3ee',
+        piston: 'c++',
+        ext: 'cpp',
+        filename: 'program.cpp',
+        libs: [
+          '#include <iostream>', '#include <vector>', '#include <string>', '#include <algorithm>',
+          '#include <cmath>', '#include <map>', '#include <unordered_map>', '#include <set>',
+          '#include <queue>', '#include <stack>', '#include <deque>', '#include <numeric>',
+          '#include <iomanip>', '#include <sstream>', '#include <bitset>', '#include <tuple>',
+          '#include <bits/stdc++.h>'
+        ],
+        template: `#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <cmath>\n#include <iomanip>\n\nusing namespace std;\n\nint main() {\n    vector<double> data = {12.5, 44.8, 19.2, 67.4, 31.0};\n    sort(data.begin(), data.end());\n    cout << "C++ 17 STL sorted: ";\n    for (double v : data) cout << v << " ";\n    cout << "\\nMax: " << data.back() << endl;\n    return 0;\n}`
+      },
+      java: {
+        name: 'Java (OpenJDK)',
+        badge: 'JAVA SE',
+        color: '#fb923c',
+        piston: 'java',
+        ext: 'java',
+        filename: 'Main.java',
+        libs: [
+          'import java.util.*;', 'import java.math.*;', 'import java.io.*;',
+          'import java.time.*;', 'import java.text.*;', 'import java.util.stream.*;', 'import java.util.regex.*;'
+        ],
+        template: `import java.util.*;\nimport java.math.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        double[] nums = {10.5, 25.0, 42.8, 16.2};\n        Arrays.sort(nums);\n        System.out.println("Java OpenJDK OK!");\n        System.out.println("Sorted: " + Arrays.toString(nums));\n    }\n}`
+      },
+      csharp: {
+        name: 'C# (.NET Core)',
+        badge: 'C# / .NET',
+        color: '#c084fc',
+        piston: 'csharp.net',
+        ext: 'cs',
+        filename: 'Program.cs',
+        libs: [
+          'using System;', 'using System.Collections.Generic;', 'using System.Linq;',
+          'using System.Text;', 'using System.Math;', 'using System.IO;', 'using System.Text.RegularExpressions;'
+        ],
+        template: `using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        var numbers = new List<double> { 15.4, 28.9, 11.2, 34.7 };\n        Console.WriteLine("C# .NET OK!");\n        Console.WriteLine($"Sum: {numbers.Sum():F2}");\n        Console.WriteLine($"Max: {numbers.Max():F2}");\n    }\n}`
+      }
+    };
+
+    function openLanguage(langKey) {
+      currentLang = langKey;
+      const cfg = LANGUAGES[langKey];
+
+      const badge = document.getElementById('ide-badge');
+      badge.textContent = cfg.badge;
+      badge.style.color = cfg.color;
+      badge.style.textShadow = `0 0 12px ${cfg.color}`;
+
+      document.getElementById('ide-title').textContent = cfg.name;
+      const dlBtn = document.getElementById('download-code-btn');
+      dlBtn.textContent = `${trDynamic('Скачать')} .${cfg.ext}`;
+
+      const editor = document.getElementById('code-editor');
+      editor.value = cfg.template;
+
+      if (!tabListenerAdded) {
+        tabListenerAdded = true;
+        editor.addEventListener('keydown', function(e) {
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+          }
+        });
+      }
+
+      renderLibraries();
+
+      const term = document.getElementById('terminal-out');
+      term.classList.remove('error');
+      term.textContent = `${cfg.name} — ${trDynamic('Готово к запуску. Нажмите «▶ Запустить»...')}`;
+
+      openView('ide');
+    }
+
+    function renderLibraries() {
+      const cfg = LANGUAGES[currentLang];
+      const editorVal = document.getElementById('code-editor').value;
+      const grid = document.getElementById('lib-grid');
+      grid.innerHTML = '';
+
+      const lbl = document.getElementById('lib-count-label');
+      lbl._origRu = `Библиотеки (${cfg.libs.length}):`;
+      lbl.textContent = `${trDynamic('Библиотеки')} (${cfg.libs.length}):`;
+
+      cfg.libs.forEach(lib => {
+        const chip = document.createElement('button');
+        const isAlreadyInCode = editorVal.includes(lib);
+        chip.className = 'lib-chip' + (isAlreadyInCode ? ' included' : '');
+        chip.textContent = (isAlreadyInCode ? '✓ ' : '+ ') + lib;
+        chip.onclick = () => {
+          const ed = document.getElementById('code-editor');
+          if (!ed.value.includes(lib)) {
+            ed.value = lib + '\n' + ed.value;
+          }
+          renderLibraries();
+        };
+        grid.appendChild(chip);
+      });
+    }
+
+    function includeAllLibraries() {
+      const cfg = LANGUAGES[currentLang];
+      const ed = document.getElementById('code-editor');
+      const missing = cfg.libs.filter(lib => !ed.value.includes(lib));
+      if (missing.length > 0) {
+        ed.value = missing.join('\n') + '\n\n' + ed.value;
+      }
+      renderLibraries();
+    }
+
+    async function runCode() {
+      const cfg = LANGUAGES[currentLang];
+      const code = document.getElementById('code-editor').value;
+      const stdin = document.getElementById('stdin-input').value;
+      const term = document.getElementById('terminal-out');
+      const runBtn = document.getElementById('run-btn');
+
+      term.classList.remove('error');
+      term.textContent = `⏳ ${trDynamic('Компиляция и выполнение')} ${cfg.filename}...`;
+      runBtn.disabled = true;
+
+      try {
+        const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: cfg.piston,
+            version: '*',
+            files: [{ name: cfg.filename, content: code }],
+            stdin: stdin
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.compile && data.compile.code !== 0) {
+          term.classList.add('error');
+          term.textContent = `${trDynamic('Ошибка компиляции')}:\n${data.compile.output || data.compile.stderr}`;
+        } else if (data.run) {
+          if (data.run.code !== 0 && !data.run.stdout) {
+            term.classList.add('error');
+          }
+          term.textContent = data.run.output || trDynamic('(Программа выполнена успешно, вывод пуст)');
+        } else {
+          term.classList.add('error');
+          term.textContent = trDynamic('Ошибка ответа от компилятора. Попробуйте снова.');
+        }
+      } catch (err) {
+        term.classList.add('error');
+        term.textContent = trDynamic('Ошибка сети при обращении к серверу компиляции.');
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    function downloadSourceFile() {
+      const cfg = LANGUAGES[currentLang];
+      const code = document.getElementById('code-editor').value;
+      const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = cfg.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Инициализация языков при запуске
+    renderWorldLanguages();
+    startTranslationObserver();
+    if (currentAppLang !== 'ru') {
+      applyLanguageToDOM(currentAppLang);
+    }
+  </script>
+</body>
+
+</html>
