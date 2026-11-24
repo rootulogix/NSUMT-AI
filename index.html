@@ -572,6 +572,8 @@
       cursor: pointer;
       flex-shrink: 0;
       box-shadow: 0 0 14px rgba(255, 255, 255, 0.22);
+      text-decoration: none;
+      display: inline-block;
     }
 
     .open-btn.secondary {
@@ -1069,6 +1071,45 @@
       margin-bottom: 10px;
     }
 
+    .book-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .book-meta {
+      min-width: 0;
+    }
+
+    .book-source {
+      font-size: 10px;
+      font-weight: 700;
+      color: #34d399;
+      margin-bottom: 2px;
+    }
+
+    .book-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .book-author {
+      font-size: 11px;
+      color: #8e8e93;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     footer {
       text-align: center;
       margin-top: 28px;
@@ -1130,6 +1171,7 @@
         <span class="bookmark-pill no-tr" onclick="quickLaunch('cpp')">C++</span>
         <span class="bookmark-pill no-tr" onclick="quickLaunch('java')">Java</span>
         <span class="bookmark-pill no-tr" onclick="quickLaunch('csharp')">C#</span>
+        <span class="bookmark-pill no-tr" onclick="quickLaunch('books')">Books</span>
         <span class="bookmark-pill no-tr" onclick="openInternalWeb('https://sharecad.org/ru')">ShareCAD Web</span>
       </div>
 
@@ -1275,8 +1317,8 @@
           <button class="open-btn">Открыть</button>
         </div>
 
-        <!-- 7. Библиотека книг -->
-        <div class="app-card" data-keywords="библиотека книги учебники нггту нгмк литература" onclick="openView('books')">
+        <!-- 7. Библиотека книг (АКТИВИРОВАНА: DOAB + OPENALEX OPEN ACCESS) -->
+        <div class="app-card" data-keywords="библиотека книги учебники нггту нгмк литература doab openalex" onclick="openView('books')">
           <div class="app-icon xenon-lib">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
@@ -1286,11 +1328,11 @@
           <div class="app-meta">
             <div class="app-title-row">
               <h2>Библиотека книг</h2>
-              <span class="status-pill status-next">Этап 3</span>
+              <span class="status-pill status-live">Активен</span>
             </div>
-            <p>Учебники НГГТУ, справочники НГМК и техническая литература</p>
+            <p>Open Access книги (DOAB и OpenAlex), учебники НГГТУ и справочники</p>
           </div>
-          <button class="open-btn secondary">Скоро</button>
+          <button class="open-btn">Открыть</button>
         </div>
 
       </div>
@@ -1391,15 +1433,36 @@
       </div>
     </div>
 
-    <!-- ЭТАП 3: БИБЛИОТЕКА -->
+    <!-- ЭТАП 3: БИБЛИОТЕКА КНИГ (DOAB + OPENALEX OPEN ACCESS) -->
     <div id="view-books" class="view">
       <div class="top-bar">
         <button class="back-btn" onclick="openView('home')">← Все программы</button>
-        <span class="no-tr" style="font-size: 12px; color: #34d399; font-weight: 700;">NSUMT LIBRARY</span>
+        <span class="no-tr" style="font-size: 12px; color: #34d399; font-weight: 700;">NSUMT OPEN LIBRARY</span>
       </div>
+
       <div class="panel-card">
-        <h3>Библиотека книг (Этап 3)</h3>
-        <p>База открытых учебников (Open Access), справочников по автоматизации процессов и методических материалов НГГТУ.</p>
+        <h3>Поиск книг в Open Access</h3>
+        <p>Живой поиск по открытым научным и учебным изданиям через DOAB и OpenAlex (только легальный открытый доступ).</p>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <input
+            type="text"
+            id="books-query"
+            class="stdin-input"
+            style="margin-bottom:0; flex:1;"
+            placeholder="Например: automation, mining, python, mechanics..."
+            onkeydown="if(event.key==='Enter') searchOpenBooks()"
+          />
+          <button class="action-btn neon-run" style="width:auto; padding:0 16px;" onclick="searchOpenBooks()">Найти</button>
+        </div>
+
+        <div class="btn-row" style="margin-bottom:10px;">
+          <a href="https://doabooks.org/" target="_blank" class="action-btn outline">DOAB (111 500+ книг) ↗</a>
+          <a href="https://open.umn.edu/opentextbooks" target="_blank" class="action-btn outline">Open Textbook Library ↗</a>
+        </div>
+
+        <div id="books-status" style="font-size:11px; color:#9ca3af; margin-bottom:8px;">Введите запрос и нажмите «Найти».</div>
+        <div id="books-results" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
     </div>
 
@@ -1831,7 +1894,7 @@
         'Компилятор G++ 17, библиотека STL и экспорт программ .cpp': 'G++ 17 kompilyatori, STL kutubxonasi va .cpp dasturlar eksporti',
         'Среда JDK со стандартными пакетами java.util / math и экспортом .java': 'Standart java.util / math paketlari va .java eksportli JDK muhiti',
         'Платформа .NET с пространствами имён System и экспортом .cs': 'System nomlar fazosi va .cs eksportiga ega .NET platformasi',
-        'Учебники НГГТУ, справочники НГМК и техническая литература': 'NDKTU darsliklari, NKMK ma’lumotnomalari va texnik adabiyotlar',
+        'Open Access книги (DOAB и OpenAlex), учебники НГГТУ и справочники': 'Open Access kitoblar (DOAB va OpenAlex), NDKTU darsliklari va ma’lumotnomalar',
         'Библиотека книг': 'Kitoblar kutubxonasi',
         '← Все программы': '← Barcha dasturlar',
         'Поддержка': 'Qo‘llab-quvvatlash',
@@ -1857,8 +1920,11 @@
         'Встроенный браузер': 'Ichki brauzer',
         '↻ Обновить': '↻ Yangilash',
         'Открыть в окне ↗': 'Oynada ochish ↗',
-        'Библиотека книг (Этап 3)': 'Kitoblar kutubxonasi (3-bosqich)',
-        'База открытых учебников (Open Access), справочников по автоматизации процессов и методических материалов НГГТУ.': 'Ochiq darsliklar (Open Access), jarayonlarni avtomatlashtirish ma’lumotnomalari va NDKTU uslubiy materiallari bazasi.',
+        'Поиск книг в Open Access': 'Open Access kitoblarini qidirish',
+        'Живой поиск по открытым научным и учебным изданиям через DOAB и OpenAlex (только легальный открытый доступ).': 'DOAB va OpenAlex orqali ochiq ilmiy va o‘quv nashrlarini jonli qidirish (faqat qonuniy ochiq kirish).',
+        'Например: automation, mining, python, mechanics...': 'Masalan: automation, mining, python, mechanics...',
+        'Найти': 'Qidirish',
+        'Введите запрос и нажмите «Найти».': 'So‘rovni kiriting va «Qidirish» tugmasini bosing.',
         'Поддержка NSUMT-AI': 'NSUMT-AI qo‘llab-quvvatlash',
         'Выберите тему обращения или опишите проблему — сообщение сразу уйдёт команде разработки.': 'Murojaat mavzusini tanlang yoki muammoni yozing — xabar darhol ishlab chiquvchilar jamoasiga yuboriladi.',
         'Ошибка в коде': 'Koddagi xatolik',
@@ -1866,7 +1932,7 @@
         'Учебники НГГТУ': 'NDKTU darsliklari',
         'Напишите ваш вопрос или предложение...': 'Savolingiz yoki taklifingizni yozing...',
         'Отправить в чат': 'Chatga yuborish',
-        'Написать на почту': 'Pochtaga yozish',
+        'Написать на почту': 'Pochtaga yuborish',
         'Библиотеки языка:': 'Til kutubxonalari:',
         'Библиотеки': 'Kutubxonalar',
         'Скачать': 'Yuklab olish',
@@ -1886,7 +1952,7 @@
         'Компилятор G++ 17, библиотека STL и экспорт программ .cpp': 'G++ 17 compiler, STL library & .cpp program export',
         'Среда JDK со стандартными пакетами java.util / math и экспортом .java': 'JDK runtime with java.util / math packages & .java export',
         'Платформа .NET с пространствами имён System и экспортом .cs': '.NET runtime with System namespaces & .cs file export',
-        'Учебники НГГТУ, справочники НГМК и техническая литература': 'NSUMT textbooks, NMMC handbooks & engineering literature',
+        'Open Access книги (DOAB и OpenAlex), учебники НГГТУ и справочники': 'Open Access books (DOAB & OpenAlex), NSUMT textbooks & handbooks',
         'Библиотека книг': 'Book Library',
         '← Все программы': '← All programs',
         'Поддержка': 'Support',
@@ -1912,8 +1978,11 @@
         'Встроенный браузер': 'Built-in Browser',
         '↻ Обновить': '↻ Reload',
         'Открыть в окне ↗': 'Open externally ↗',
-        'Библиотека книг (Этап 3)': 'Book Library (Stage 3)',
-        'База открытых учебников (Open Access), справочников по автоматизации процессов и методических материалов НГГТУ.': 'Open Access textbooks, process automation handbooks & NSUMT study materials.',
+        'Поиск книг в Open Access': 'Search Open Access Books',
+        'Живой поиск по открытым научным и учебным изданиям через DOAB и OpenAlex (только легальный открытый доступ).': 'Live search across open academic & educational books via DOAB and OpenAlex (legal open access only).',
+        'Например: automation, mining, python, mechanics...': 'E.g.: automation, mining, python, mechanics...',
+        'Найти': 'Search',
+        'Введите запрос и нажмите «Найти».': 'Enter a query and click "Search".',
         'Поддержка NSUMT-AI': 'NSUMT-AI Support',
         'Выберите тему обращения или опишите проблему — сообщение сразу уйдёт команде разработки.': 'Select a topic or describe your issue — it will be sent straight to the dev team.',
         'Ошибка в коде': 'Code Error',
@@ -1947,13 +2016,12 @@
       'NSUMT-AI', 'Ulogix', 'AutoCAD Studio', 'AutoCAD', 'LibreCAD', 'ShareCAD',
       'Autodesk Viewer', 'Python 3', 'Python', 'C++ 17', 'C++', 'G++ 17', 'GCC',
       'Java', 'OpenJDK', 'C#', '.NET', '.DXF', 'DWG', '.py', '.cpp', '.java', '.cs', '.c',
-      'stdin', 'STL', 'JDK', 'System', 'java.util', 'math'
+      'stdin', 'STL', 'JDK', 'System', 'java.util', 'math', 'DOAB', 'OpenAlex', 'Open Access'
     ];
 
     let currentAppLang = 'ru';
     const translationCache = { ru: {} };
     let translationJobId = 0;
-    let isApplyingTranslation = false;
 
     try {
       const savedLang = localStorage.getItem('ulogix_app_lang');
@@ -2006,7 +2074,6 @@
       return res;
     }
 
-    // Перевод с жёстким таймаутом 3.5 сек и параллельным запросом (не тормозит интерфейс)
     async function fetchWithTimeout(url, ms = 3500) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), ms);
@@ -2038,7 +2105,6 @@
         }
       }
 
-      // Резервный поштучный перевод, если разделитель склеился
       await Promise.all(chunk.map(async (origStr, idx) => {
         try {
           const u = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(maskedList[idx].masked)}`;
@@ -2078,7 +2144,6 @@
 
     function paintCachedDOM(targetLang, textNodes, placeholders) {
       const cache = loadLangCache(targetLang);
-      isApplyingTranslation = true;
 
       textNodes.forEach(node => {
         const orig = node._origRu;
@@ -2100,8 +2165,6 @@
           el.placeholder = cache[orig];
         }
       });
-
-      isApplyingTranslation = false;
     }
 
     async function applyLanguageToDOM(targetLang) {
@@ -2149,10 +2212,8 @@
         stringsToTranslate.push(el.dataset.origPlaceholder);
       });
 
-      // 1. Мгновенно применяем всё, что уже есть в словаре/кэше без задержки
       paintCachedDOM(targetLang, textNodes, placeholders);
 
-      // 2. Если для выбранного языка остались непереведённые фразы — подгружаем их и обновляем экран
       if (targetLang !== 'ru') {
         await batchTranslateStrings(stringsToTranslate, targetLang, jobId);
         if (jobId === translationJobId) {
@@ -2270,7 +2331,7 @@
       { id: 'cpp', title: 'C++ 17 (G++)', sub: 'Компилятор G++ и STL (.cpp)', color: '#22d3ee', keys: ['c++', 'cpp', 'g++', 'stl', 'си++'], run: () => openLanguage('cpp') },
       { id: 'java', title: 'Java (OpenJDK)', sub: 'Среда JDK (.java)', color: '#fb923c', keys: ['java', 'jdk', 'джава', 'ява'], run: () => openLanguage('java') },
       { id: 'csharp', title: 'C# (.NET)', sub: 'Платформа .NET (.cs)', color: '#c084fc', keys: ['c#', 'csharp', 'dotnet', 'шарп'], run: () => openLanguage('csharp') },
-      { id: 'books', title: 'Библиотека книг', sub: 'Учебники НГГТУ и справочники НГМК', color: '#34d399', keys: ['библиотека', 'книги', 'учебники', 'нггту', 'нгмк'], run: () => openView('books') }
+      { id: 'books', title: 'Библиотека книг', sub: 'DOAB, OpenAlex и учебники НГГТУ', color: '#34d399', keys: ['библиотека', 'книги', 'books', 'учебники', 'нггту', 'нгмк', 'doab', 'openalex'], run: () => openView('books') }
     ];
 
     function handleBrowserInput() {
@@ -2812,6 +2873,69 @@
       a.download = cfg.filename;
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    // --- 9. БИБЛИОТЕКА КНИГ (DOAB REST API + OPENALEX OPEN ACCESS) ---
+    async function searchOpenBooks() {
+      const qInput = document.getElementById('books-query');
+      const statusEl = document.getElementById('books-status');
+      const listEl = document.getElementById('books-results');
+      const query = (qInput.value || 'engineering').trim();
+
+      statusEl.textContent = `⏳ ${trDynamic('Поиск в DOAB и OpenAlex')}...`;
+      listEl.innerHTML = '';
+
+      const items = [];
+
+      try {
+        const doabUrl = `https://directory.doabooks.org/rest/search?query=${encodeURIComponent(query)}&expand=metadata`;
+        const res = await fetch(doabUrl);
+        if (res.ok) {
+          const data = await res.json();
+          const arr = Array.isArray(data) ? data.slice(0, 6) : [];
+          arr.forEach(entry => {
+            const meta = entry.metadata || [];
+            const getMeta = (k) => (meta.find(m => m.key === k)?.value) || '';
+            const title = entry.name || getMeta('dc.title') || 'Без названия';
+            const author = getMeta('dc.contributor.author') || 'Автор не указан';
+            const handle = entry.handle ? `https://hdl.handle.net/${entry.handle}` : 'https://doabooks.org/';
+            items.push({ source: 'DOAB', title, author, url: handle });
+          });
+        }
+      } catch (e) {}
+
+      try {
+        const oaUrl = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&filter=type:book,is_oa:true&per_page=6`;
+        const res = await fetch(oaUrl);
+        if (res.ok) {
+          const data = await res.json();
+          const works = data.results || [];
+          works.forEach(w => {
+            const authors = (w.authorships || []).map(a => a.author?.display_name).filter(Boolean).slice(0, 2).join(', ');
+            const link = w.open_access?.oa_url || w.primary_location?.landing_page_url || w.id;
+            if (w.title && link) {
+              items.push({ source: 'OpenAlex', title: w.title, author: authors || 'Open Access', url: link });
+            }
+          });
+        }
+      } catch (e) {}
+
+      if (!items.length) {
+        statusEl.textContent = trDynamic('Ничего не найдено или внешний каталог временно не ответил. Попробуйте другой запрос.');
+        return;
+      }
+
+      statusEl.textContent = `${trDynamic('Найдено книг в открытом доступе')}: ${items.length}`;
+      listEl.innerHTML = items.map(b => `
+        <div class="book-card">
+          <div class="book-meta">
+            <div class="book-source no-tr">${b.source}</div>
+            <div class="book-title no-tr">${b.title}</div>
+            <div class="book-author no-tr">${b.author}</div>
+          </div>
+          <a href="${b.url}" target="_blank" class="open-btn">${trDynamic('Открыть')}</a>
+        </div>
+      `).join('');
     }
 
     // Инициализация языков при запуске
