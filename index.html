@@ -1153,7 +1153,7 @@
     <div id="view-home" class="view active">
       <div class="app-list" id="app-list">
 
-        <!-- 1. AutoCAD Studio (с вращающейся чертёжной 3D-плоскостью и отрезками запуска AutoCAD вокруг иконки) -->
+        <!-- 1. AutoCAD Studio -->
         <div class="app-card" data-keywords="autocad cad dxf dwg чертеж гост автокад" onclick="openView('cad')">
           <div class="app-icon xenon-cad">
             <canvas id="cad-splash-icon" width="112" height="112"></canvas>
@@ -1492,7 +1492,6 @@
 
       cIconCtx.clearRect(0, 0, w, h);
 
-      // 1. Вращающаяся 3D-чертёжная плоскость с перспективной сеткой (как при запуске AutoCAD)
       const planeSize = 35;
       const tilt = 0.62;
       const projectPlane = (px, py) => {
@@ -1526,7 +1525,6 @@
         cIconCtx.stroke();
       });
 
-      // Угловые маркеры привязки (OSNAP квадраты) на вершинах плоскости
       const corners = [
         projectPlane(-planeSize, -planeSize),
         projectPlane(planeSize, -planeSize),
@@ -1540,7 +1538,6 @@
       });
       cIconCtx.restore();
 
-      // 2. Внешний вращающийся чертёжный контур (пунктирная окружность + градусные засечки)
       cIconCtx.save();
       cIconCtx.translate(cx, cy);
       cIconCtx.rotate(cadSplashAngle * 0.75);
@@ -1565,7 +1562,6 @@
       }
       cIconCtx.restore();
 
-      // 3. Встречно-вращающиеся чертёжные отрезки и дуги с узлами привязки OSNAP
       cIconCtx.save();
       cIconCtx.translate(cx, cy);
       cIconCtx.rotate(-cadSplashAngle * 1.15);
@@ -1582,7 +1578,6 @@
       cIconCtx.arc(0, 0, 37, Math.PI - 0.55, Math.PI + 0.85);
       cIconCtx.stroke();
 
-      // Чертёжные отрезки касательных и хорд
       cIconCtx.shadowBlur = 4;
       cIconCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
       cIconCtx.lineWidth = 1.15;
@@ -1593,7 +1588,6 @@
       cIconCtx.lineTo(27, -25);
       cIconCtx.stroke();
 
-      // Точки привязки OSNAP на концах отрезков
       cIconCtx.fillStyle = '#00f5d4';
       cIconCtx.beginPath();
       cIconCtx.arc(-35, -15, 2.2, 0, Math.PI * 2);
@@ -1709,7 +1703,7 @@
     }
     drawHackerGlobe();
 
-    // --- 2. БАЗА ВСЕХ ЯЗЫКОВ МИРА (110+ ЯЗЫКОВ) И НЕЙРОННЫЙ ПЕРЕВОДЧИК ---
+    // --- 2. БАЗА ВСЕХ ЯЗЫКОВ МИРА (110+ ЯЗЫКОВ) И БЫСТРЫЙ НЕЙРОННЫЙ ПЕРЕВОДЧИК ---
     const WORLD_LANGUAGES = [
       { code: 'ru', name: 'Русский', en: 'Russian' },
       { code: 'uz', name: 'O‘zbekcha', en: 'Uzbek' },
@@ -1838,6 +1832,7 @@
         'Среда JDK со стандартными пакетами java.util / math и экспортом .java': 'Standart java.util / math paketlari va .java eksportli JDK muhiti',
         'Платформа .NET с пространствами имён System и экспортом .cs': 'System nomlar fazosi va .cs eksportiga ega .NET platformasi',
         'Учебники НГГТУ, справочники НГМК и техническая литература': 'NDKTU darsliklari, NKMK ma’lumotnomalari va texnik adabiyotlar',
+        'Библиотека книг': 'Kitoblar kutubxonasi',
         '← Все программы': '← Barcha dasturlar',
         'Поддержка': 'Qo‘llab-quvvatlash',
         'Язык интерфейса': 'Interfeys tili',
@@ -1871,7 +1866,12 @@
         'Учебники НГГТУ': 'NDKTU darsliklari',
         'Напишите ваш вопрос или предложение...': 'Savolingiz yoki taklifingizni yozing...',
         'Отправить в чат': 'Chatga yuborish',
-        'Написать на почту': 'Pochtaga yozish'
+        'Написать на почту': 'Pochtaga yozish',
+        'Библиотеки языка:': 'Til kutubxonalari:',
+        'Библиотеки': 'Kutubxonalar',
+        'Скачать': 'Yuklab olish',
+        'Объектов': 'Obyektlar',
+        'Объектов: 0': 'Obyektlar: 0'
       },
       en: {
         'Поиск программы (Python, C++, AutoCAD)...': 'Search program (Python, C++, AutoCAD)...',
@@ -1887,6 +1887,7 @@
         'Среда JDK со стандартными пакетами java.util / math и экспортом .java': 'JDK runtime with java.util / math packages & .java export',
         'Платформа .NET с пространствами имён System и экспортом .cs': '.NET runtime with System namespaces & .cs file export',
         'Учебники НГГТУ, справочники НГМК и техническая литература': 'NSUMT textbooks, NMMC handbooks & engineering literature',
+        'Библиотека книг': 'Book Library',
         '← Все программы': '← All programs',
         'Поддержка': 'Support',
         'Язык интерфейса': 'Interface Language',
@@ -1920,7 +1921,25 @@
         'Учебники НГГТУ': 'NSUMT Textbooks',
         'Напишите ваш вопрос или предложение...': 'Write your question or suggestion...',
         'Отправить в чат': 'Send to Chat',
-        'Написать на почту': 'Send Email'
+        'Написать на почту': 'Send Email',
+        'Библиотеки языка:': 'Language libraries:',
+        'Библиотеки': 'Libraries',
+        'Скачать': 'Download',
+        'Объектов': 'Objects',
+        'Объектов: 0': 'Objects: 0'
+      },
+      tr: {
+        'Поиск программы (Python, C++, AutoCAD)...': 'Program ara (Python, C++, AutoCAD)...',
+        'Инженерная экосистема Ulogix': 'Ulogix Mühendislik Ekosistemi',
+        'Активен': 'Aktif',
+        'Скоро': 'Yakında',
+        'Этап 3': 'Aşama 3',
+        'Открыть': 'Aç',
+        'Библиотека книг': 'Kitap Kütüphanesi',
+        '← Все программы': '← Tüm programlar',
+        'Поддержка': 'Destek',
+        'Язык интерфейса': 'Arayüz Dili',
+        '▶ Запустить': '▶ Çalıştır'
       }
     };
 
@@ -1933,19 +1952,21 @@
 
     let currentAppLang = 'ru';
     const translationCache = { ru: {} };
-    let domObserver = null;
+    let translationJobId = 0;
     let isApplyingTranslation = false;
 
     try {
       const savedLang = localStorage.getItem('ulogix_app_lang');
-      if (savedLang) currentAppLang = savedLang;
+      if (savedLang && WORLD_LANGUAGES.some(l => l.code === savedLang)) {
+        currentAppLang = savedLang;
+      }
     } catch (e) {}
 
     function loadLangCache(lang) {
       if (translationCache[lang]) return translationCache[lang];
       let stored = {};
       try {
-        const raw = localStorage.getItem('ulogix_tr_cache_' + lang);
+        const raw = localStorage.getItem('ulogix_tr_cache_v2_' + lang);
         if (raw) stored = JSON.parse(raw);
       } catch (e) {}
       translationCache[lang] = Object.assign({}, NATIVE_DICT[lang] || {}, stored);
@@ -1954,16 +1975,14 @@
 
     function saveLangCache(lang) {
       try {
-        localStorage.setItem('ulogix_tr_cache_' + lang, JSON.stringify(translationCache[lang] || {}));
+        localStorage.setItem('ulogix_tr_cache_v2_' + lang, JSON.stringify(translationCache[lang] || {}));
       } catch (e) {}
     }
 
     function trDynamic(ruStr) {
       if (currentAppLang === 'ru' || !ruStr) return ruStr;
       const cache = loadLangCache(currentAppLang);
-      if (cache[ruStr]) return cache[ruStr];
-      batchTranslateStrings([ruStr], currentAppLang);
-      return ruStr;
+      return cache[ruStr] || ruStr;
     }
 
     function maskTokens(text) {
@@ -1973,7 +1992,7 @@
         if (masked.includes(tok)) {
           const idx = used.length;
           used.push(tok);
-          masked = masked.split(tok).join(`[[${idx}]]`);
+          masked = masked.split(tok).join(`{${idx}}`);
         }
       });
       return { masked, used };
@@ -1982,12 +2001,57 @@
     function unmaskTokens(text, used) {
       let res = text;
       used.forEach((tok, idx) => {
-        res = res.replace(new RegExp(`\\[\\[\\s*${idx}\\s*\\]\\]`, 'g'), tok);
+        res = res.replace(new RegExp(`\\{\\s*${idx}\\s*\\}`, 'g'), tok);
       });
       return res;
     }
 
-    async function batchTranslateStrings(strings, targetLang) {
+    // Перевод с жёстким таймаутом 3.5 сек и параллельным запросом (не тормозит интерфейс)
+    async function fetchWithTimeout(url, ms = 3500) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), ms);
+      try {
+        const res = await fetch(url, { signal: ctrl.signal });
+        return await res.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function translateSingleChunk(chunk, targetLang) {
+      const maskedList = chunk.map(s => maskTokens(s));
+      const joined = maskedList.map(m => m.masked).join('\n~\n');
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(joined)}`;
+      const data = await fetchWithTimeout(url, 3800);
+
+      const cache = loadLangCache(targetLang);
+      if (data && Array.isArray(data[0])) {
+        const fullTranslated = data[0].map(part => part[0]).join('');
+        const parts = fullTranslated.split(/\s*~\s*/);
+        if (parts.length === chunk.length) {
+          chunk.forEach((origStr, idx) => {
+            if (parts[idx]) {
+              cache[origStr] = unmaskTokens(parts[idx].trim(), maskedList[idx].used);
+            }
+          });
+          return;
+        }
+      }
+
+      // Резервный поштучный перевод, если разделитель склеился
+      await Promise.all(chunk.map(async (origStr, idx) => {
+        try {
+          const u = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(maskedList[idx].masked)}`;
+          const d = await fetchWithTimeout(u, 3000);
+          if (d && Array.isArray(d[0])) {
+            const tr = d[0].map(p => p[0]).join('');
+            cache[origStr] = unmaskTokens(tr.trim(), maskedList[idx].used);
+          }
+        } catch (e) {}
+      }));
+    }
+
+    async function batchTranslateStrings(strings, targetLang, jobId) {
       const cache = loadLangCache(targetLang);
       const missing = [...new Set(strings)].filter(s => s && s.trim().length > 0 && !cache[s]);
       if (missing.length === 0) return;
@@ -1996,35 +2060,52 @@
       toast.classList.add('active');
 
       try {
-        for (let i = 0; i < missing.length; i += 18) {
-          const chunk = missing.slice(i, i + 18);
-          const maskedList = chunk.map(s => maskTokens(s));
-          const joined = maskedList.map(m => m.masked).join('\n|||\n');
-
-          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(joined)}`;
-          const res = await fetch(url);
-          const data = await res.json();
-
-          if (data && Array.isArray(data[0])) {
-            const fullTranslated = data[0].map(part => part[0]).join('');
-            const parts = fullTranslated.split(/\n?\s*\|\|\|\s*\n?/);
-
-            chunk.forEach((origStr, idx) => {
-              if (parts[idx]) {
-                const clean = unmaskTokens(parts[idx].trim(), maskedList[idx].used);
-                cache[origStr] = clean;
-              }
-            });
-          }
+        const chunks = [];
+        for (let i = 0; i < missing.length; i += 10) {
+          chunks.push(missing.slice(i, i + 10));
         }
-        saveLangCache(targetLang);
+        await Promise.all(chunks.map(ch => translateSingleChunk(ch, targetLang)));
+        if (jobId === translationJobId) {
+          saveLangCache(targetLang);
+        }
       } catch (e) {
       } finally {
-        toast.classList.remove('active');
+        if (jobId === translationJobId) {
+          toast.classList.remove('active');
+        }
       }
     }
 
+    function paintCachedDOM(targetLang, textNodes, placeholders) {
+      const cache = loadLangCache(targetLang);
+      isApplyingTranslation = true;
+
+      textNodes.forEach(node => {
+        const orig = node._origRu;
+        const trimmed = orig.trim();
+        if (targetLang === 'ru') {
+          node.nodeValue = orig;
+        } else if (cache[trimmed]) {
+          const lead = orig.match(/^\s*/)[0];
+          const trail = orig.match(/\s*$/)[0];
+          node.nodeValue = lead + cache[trimmed] + trail;
+        }
+      });
+
+      placeholders.forEach(el => {
+        const orig = el.dataset.origPlaceholder;
+        if (targetLang === 'ru') {
+          el.placeholder = orig;
+        } else if (cache[orig]) {
+          el.placeholder = cache[orig];
+        }
+      });
+
+      isApplyingTranslation = false;
+    }
+
     async function applyLanguageToDOM(targetLang) {
+      const jobId = ++translationJobId;
       currentAppLang = targetLang;
       try { localStorage.setItem('ulogix_app_lang', targetLang); } catch (e) {}
 
@@ -2068,52 +2149,24 @@
         stringsToTranslate.push(el.dataset.origPlaceholder);
       });
 
+      // 1. Мгновенно применяем всё, что уже есть в словаре/кэше без задержки
+      paintCachedDOM(targetLang, textNodes, placeholders);
+
+      // 2. Если для выбранного языка остались непереведённые фразы — подгружаем их и обновляем экран
       if (targetLang !== 'ru') {
-        await batchTranslateStrings(stringsToTranslate, targetLang);
+        await batchTranslateStrings(stringsToTranslate, targetLang, jobId);
+        if (jobId === translationJobId) {
+          paintCachedDOM(targetLang, textNodes, placeholders);
+        }
       }
-
-      const cache = loadLangCache(targetLang);
-      isApplyingTranslation = true;
-
-      textNodes.forEach(node => {
-        const orig = node._origRu;
-        const trimmed = orig.trim();
-        if (targetLang === 'ru') {
-          node.nodeValue = orig;
-        } else if (cache[trimmed]) {
-          const lead = orig.match(/^\s*/)[0];
-          const trail = orig.match(/\s*$/)[0];
-          node.nodeValue = lead + cache[trimmed] + trail;
-        }
-      });
-
-      placeholders.forEach(el => {
-        const orig = el.dataset.origPlaceholder;
-        if (targetLang === 'ru') {
-          el.placeholder = orig;
-        } else if (cache[orig]) {
-          el.placeholder = cache[orig];
-        }
-      });
-
-      isApplyingTranslation = false;
-      renderWorldLanguages(document.getElementById('lang-search-input').value);
-    }
-
-    function startTranslationObserver() {
-      if (domObserver) return;
-      domObserver = new MutationObserver(() => {
-        if (isApplyingTranslation || currentAppLang === 'ru') return;
-        applyLanguageToDOM(currentAppLang);
-      });
-      domObserver.observe(document.body, { childList: true, subtree: true });
     }
 
     function toggleLangModal(show) {
       const modal = document.getElementById('lang-modal');
       modal.classList.toggle('open', show);
       if (show) {
-        renderWorldLanguages(document.getElementById('lang-search-input').value);
+        const searchInput = document.getElementById('lang-search-input');
+        renderWorldLanguages(searchInput ? searchInput.value : '');
       }
     }
 
@@ -2135,7 +2188,7 @@
       );
 
       grid.innerHTML = filtered.map(l => `
-        <button class="lang-option ${l.code === currentAppLang ? 'selected' : ''}" onclick="selectWorldLanguage('${l.code}')">
+        <button type="button" class="lang-option ${l.code === currentAppLang ? 'selected' : ''}" onclick="selectWorldLanguage('${l.code}')">
           <div>
             <span class="lang-native">${l.name}</span>
             <span class="lang-sub">${l.en}</span>
@@ -2357,6 +2410,9 @@
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById('view-' + name).classList.add('active');
       if (name === 'cad') initCadCanvas();
+      if (currentAppLang !== 'ru') {
+        applyLanguageToDOM(currentAppLang);
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -2760,7 +2816,6 @@
 
     // Инициализация языков при запуске
     renderWorldLanguages();
-    startTranslationObserver();
     if (currentAppLang !== 'ru') {
       applyLanguageToDOM(currentAppLang);
     }
